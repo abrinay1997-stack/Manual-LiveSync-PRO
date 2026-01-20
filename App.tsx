@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import Logo from './components/Logo';
 import Card from './components/Card';
@@ -68,6 +67,10 @@ const App: React.FC = () => {
     setIsSidebarOpen(false);
     setSearchQuery('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleDownloadPDF = () => {
+    window.print();
   };
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -190,7 +193,10 @@ const App: React.FC = () => {
             <p className="text-cyan-400 text-[10px] uppercase tracking-[0.4em] font-bold mt-1">LIVESYNC PRO TECHNICAL RIDER</p>
           </div>
           <div className="flex items-center gap-4">
-            <button className="bg-white text-black px-6 py-2.5 rounded-xl text-xs font-extrabold hover:bg-slate-200 transition-all flex items-center gap-2 shadow-lg shadow-white/5">
+            <button 
+              onClick={handleDownloadPDF}
+              className="bg-white text-black px-6 py-2.5 rounded-xl text-xs font-extrabold hover:bg-slate-200 transition-all flex items-center gap-2 shadow-lg shadow-white/5"
+            >
               <Download size={14} /> Descargar PDF
             </button>
           </div>
@@ -261,7 +267,7 @@ const App: React.FC = () => {
                 )}
               </Card>
 
-              <div className="pt-24 flex flex-col md:flex-row items-center justify-between gap-8 border-t border-white/5">
+              <div className="pt-24 flex flex-col md:flex-row items-center justify-between gap-8 border-t border-white/5 no-print">
                 <button 
                   onClick={() => navigate('prev')}
                   disabled={currentSectionIndex === 0}
@@ -298,7 +304,7 @@ const App: React.FC = () => {
         {showScrollTop && (
           <button 
             onClick={scrollToTop}
-            className="fixed bottom-24 right-8 w-12 h-12 bg-[#1a1a1a]/80 backdrop-blur-xl border border-white/10 text-white rounded-full flex items-center justify-center hover:bg-cyan-500 hover:text-black transition-all z-40 shadow-2xl animate-fade-in"
+            className="fixed bottom-24 right-8 w-12 h-12 bg-[#1a1a1a]/80 backdrop-blur-xl border border-white/10 text-white rounded-full flex items-center justify-center hover:bg-cyan-500 hover:text-black transition-all z-40 shadow-2xl animate-fade-in no-print"
           >
             <ArrowUpCircle size={24} />
           </button>
@@ -306,7 +312,7 @@ const App: React.FC = () => {
 
         <button 
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="fixed bottom-8 right-8 w-14 h-14 bg-cyan-500 text-black rounded-2xl shadow-[0_8px_32px_rgba(6,182,212,0.4)] flex items-center justify-center hover:scale-105 active:scale-95 transition-all z-50 md:hidden"
+          className="fixed bottom-8 right-8 w-14 h-14 bg-cyan-500 text-black rounded-2xl shadow-[0_8px_32px_rgba(6,182,212,0.4)] flex items-center justify-center hover:scale-105 active:scale-95 transition-all z-50 md:hidden no-print"
         >
           {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
