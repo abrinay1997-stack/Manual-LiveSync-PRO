@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LiveSync Pro - Manual</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Librería para generación de PDF en cliente -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         @keyframes fadeIn {
             from { opacity: 0; }
@@ -17,10 +19,6 @@
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
-        }
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
         }
         .animate-fade-in { animation: fadeIn 300ms ease-out forwards; }
         .animate-slide-up { animation: slideUp 400ms ease-out forwards; }
@@ -45,85 +43,96 @@
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
 
+        /* ESTILOS DE EXPORTACIÓN (Reset total para evitar páginas en blanco) */
+        #pdf-export-container {
+            background-color: #ffffff !important;
+            width: 210mm;
+            margin: 0;
+            padding: 0;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            position: relative !important;
+        }
+
+        #pdf-export-container * {
+            color: #000000 !important;
+            background-color: transparent !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            font-family: Arial, sans-serif !important;
+        }
+
+        .pdf-page {
+            padding: 20mm;
+            background: white !important;
+            position: relative;
+        }
+
+        .pdf-page-break {
+            page-break-before: always;
+        }
+
+        .pdf-title-main {
+            font-size: 36pt;
+            color: #0ea5e9 !important;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .pdf-section-title {
+            font-size: 24pt;
+            color: #0ea5e9 !important;
+            border-bottom: 2pt solid #0ea5e9;
+            margin: 30pt 0 15pt 0;
+            padding-bottom: 5pt;
+            font-weight: bold;
+        }
+
+        .pdf-subsection-title {
+            font-size: 16pt;
+            margin: 20pt 0 10pt 0;
+            font-weight: bold;
+        }
+
+        .pdf-text {
+            font-size: 11pt;
+            line-height: 1.5;
+            margin-bottom: 8pt;
+            display: block !important;
+        }
+
+        .pdf-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15pt 0;
+        }
+
+        .pdf-table th, .pdf-table td {
+            border: 1px solid #000 !important;
+            padding: 8pt;
+            text-align: left;
+            font-size: 10pt;
+        }
+
+        .pdf-table th {
+            background-color: #eee !important;
+        }
+
+        .pdf-code {
+            background-color: #f5f5f5 !important;
+            border: 1px solid #ccc !important;
+            padding: 10pt;
+            font-family: monospace;
+            font-size: 9pt;
+            margin: 10pt 0;
+            display: block;
+            white-space: pre-wrap;
+        }
+
         @media print {
-            aside, header, button, .fixed, .no-print, nav, .scroll-top-btn {
+            aside, header, .no-print, .scroll-top-btn {
                 display: none !important;
-            }
-            body {
-                background: white !important;
-                color: black !important;
-                height: auto !important;
-                overflow: visible !important;
-            }
-            #root, main {
-                background: white !important;
-                display: block !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                width: 100% !important;
-                max-width: none !important;
-                position: relative !important;
-                height: auto !important;
-                overflow: visible !important;
-            }
-            .animate-slide-up, .animate-fade-in {
-                animation: none !important;
-                transform: none !important;
-                opacity: 1 !important;
-            }
-            h1, h2, h3, h4, p, strong, span {
-                color: black !important;
-            }
-            table {
-                border-collapse: collapse !important;
-                width: 100% !important;
-                color: black !important;
-                margin-bottom: 20px !important;
-                page-break-inside: avoid !important;
-            }
-            th, td {
-                border: 1px solid #ddd !important;
-                color: black !important;
-                padding: 8px !important;
-            }
-            pre {
-                background: #f4f4f4 !important;
-                color: black !important;
-                border: 1px solid #ddd !important;
-                white-space: pre-wrap !important;
-                padding: 10px !important;
-                border-radius: 5px !important;
-                font-size: 10pt !important;
-                page-break-inside: avoid !important;
-            }
-            .bg-cyan-500\/5, .bg-purple-500\/5, .bg-white\/5, .bg-[#0f0f0f], .bg-[#050505] {
-                background: white !important;
-                box-shadow: none !important;
-            }
-            .border-white\/10 {
-                border-color: #eee !important;
-            }
-            .text-cyan-400, .text-purple-500, .text-cyan-500, .text-cyan-300 {
-                color: #000 !important;
-                text-shadow: none !important;
-                font-weight: bold !important;
-            }
-            .card-container {
-                border: none !important;
-                padding: 0 !important;
-            }
-            h1 {
-                font-size: 24pt !important;
-                margin-top: 20pt !important;
-                border-bottom: 2px solid #000 !important;
-                padding-bottom: 10pt !important;
-            }
-            h3 {
-                font-size: 16pt !important;
-                margin-top: 15pt !important;
-            }
-            .no-break {
-                page-break-inside: avoid !important;
             }
         }
     </style>
@@ -133,7 +142,11 @@
     "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
     "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
     "react/": "https://esm.sh/react@^19.2.3/",
-    "react": "https://esm.sh/react@^19.2.3"
+    "react": "https://esm.sh/react@^19.2.3",
+    "express": "https://esm.sh/express@^5.2.1",
+    "puppeteer": "https://esm.sh/puppeteer@^24.35.0",
+    "cors": "https://esm.sh/cors@^2.8.5",
+    "dotenv": "https://esm.sh/dotenv@^17.2.3"
   }
 }
 </script>
