@@ -3,7 +3,7 @@ import { ManualPart } from '../types';
 
 export const part2: ManualPart = {
   id: "part-2",
-  title: "PARTE 2: CONFIGURACIÓN COMPLETA DE PROYECTOS",
+  title: "CONFIGURACIÓN COMPLETA DE PROYECTOS",
   sections: [
     {
       id: "env-intro",

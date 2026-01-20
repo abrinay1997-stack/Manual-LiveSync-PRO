@@ -3,7 +3,7 @@ import { ManualPart } from '../types';
 
 export const part4: ManualPart = {
   id: "part-4",
-  title: "PARTE 4: CÁLCULOS Y ANÁLISIS CIENTÍFICO",
+  title: "CÁLCULOS Y ANÁLISIS CIENTÍFICO",
   sections: [
     {
       id: "calibration-objectives",

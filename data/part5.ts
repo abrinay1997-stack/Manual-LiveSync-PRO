@@ -3,7 +3,7 @@ import { ManualPart } from '../types';
 
 export const part5: ManualPart = {
   id: "part-5",
-  title: "PARTE 5: REPORTES Y RESULTADOS DETALLADOS",
+  title: "REPORTES Y RESULTADOS DETALLADOS",
   sections: [
     {
       id: "eq-master-correction-full",

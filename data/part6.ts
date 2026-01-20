@@ -3,7 +3,7 @@ import { ManualPart } from '../types';
 
 export const part6: ManualPart = {
   id: "part-6",
-  title: "PARTE 6: EXPORTACIÓN Y FLUJO FINAL",
+  title: "EXPORTACIÓN Y FLUJO FINAL",
   sections: [
     {
       id: "export-buttons-full",
@@ -56,43 +56,13 @@ export const part6: ManualPart = {
       title: "32. CONSEJOS AVANZADOS",
       content: [
         "**32.1 Para Mejorar Precisión**",
-        "• Usa RT60 medido si tienes acceso al venue previo al evento.",
-        "• Mide temperatura showtime con termómetro portátil.",
-        "• Valida capacidad SWL con el rigger (no asumas valores).",
-        "• Usa amplificadores de catálogo para cálculos de PF precisos.",
+        "• **Mide RT60:** Usa mediciones reales siempre que sea posible.",
+        "• **Drift Térmico:** Anticipa cambios de temperatura entre prueba y show.",
+        "• **Catálogo:** Usa modelos exactos de amplificadores para cálculos de consumo reales.",
         "",
-        "**32.2 Para Eventos Complejos**",
-        "• **Arena 360°:** Configura 4 torres delay equidistantes.",
-        "• **Outdoor + Wind >20 km/h:** Activa wind y considera refracción.",
-        "• **Indoor + RT60 >1.5s:** Prioriza torres delay sobre subir el SPL del Main PA. Implementa todas las EQ sugeridas.",
-        "• **Festivales multi-stage:** Crea proyectos por stage y coordina delays para bleed control.",
-        "",
-        "**32.3 Colaboración en Equipo**",
-        "• Usa modo Corporate para invitar técnicos.",
-        "• Marca proyectos importantes como \"Shared\".",
-        "• Exporta PDF antes del evento y compártelo por drive."
-      ]
-    },
-    {
-      id: "support-resources-full",
-      title: "33. SOPORTE Y RECURSOS",
-      content: [
-        "**33.1 Botón '? Ayuda'**",
-        "• Esquina superior derecha. Abre Sistema de Ayuda.",
-        "• Contiene Guías rápidas, Referencias científicas (Papers AES, ISO/IEC) y Soporte técnico.",
-        "",
-        "**33.2 Botón 'Soporte'**",
-        "• Te redirige a: https://support.livesyncpro.com/.",
-        "• Allí puedes enviar tickets, ver FAQ, acceder a video tutoriales y reportar bugs.",
-        "",
-        "**33.3 Referencias Científicas**",
-        "El botón dentro del panel muestra bibliografía técnica:",
-        "• Papers de AES (Audio Engineering Society).",
-        "• Normas ISO (ISO 9613, ISO 3382).",
-        "• Literatura sobre WST, Beamforming y RT60.",
-        "",
-        "═══════════════════════════════════════════",
-        "FIN DEL MANUAL DE USUARIO"
+        "**32.2 Rigging Seguro**",
+        "• Respeta siempre el SWL del venue.",
+        "• Considera carga dinámica (viento y motores) en el diseño final."
       ]
     }
   ]

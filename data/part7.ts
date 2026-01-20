@@ -3,7 +3,7 @@ import { ManualPart } from '../types';
 
 export const part7: ManualPart = {
   id: "part-7",
-  title: "PARTE 7: GLOSARIO TÉCNICO Y FÓRMULAS",
+  title: "GLOSARIO TÉCNICO Y FÓRMULAS",
   sections: [
     {
       id: "glossary-dictionary",

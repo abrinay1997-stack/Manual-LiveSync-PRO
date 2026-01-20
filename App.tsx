@@ -8,7 +8,7 @@ import { ManualSection, SearchResult } from './types';
 import { Search, Download, ExternalLink, Menu, X, ArrowUpCircle, ChevronRight, ChevronLeft, BookOpen, AlertCircle, Table as TableIcon, FileText } from 'lucide-react';
 
 const App: React.FC = () => {
-  const [activeSectionId, setActiveSectionId] = useState('intro');
+  const [activeSectionId, setActiveSectionId] = useState('welcome');
   const [searchQuery, setSearchQuery] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -146,8 +146,8 @@ const App: React.FC = () => {
       </div>
 
       {/* Sidebar */}
-      <aside className={`fixed inset-y-0 left-0 z-[60] w-80 bg-[#06010f] border-r border-white/5 transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="h-full flex flex-col p-6 overflow-hidden">
+      <aside className={`fixed inset-y-0 left-0 z-[60] w-80 bg-[#06010f] border-r border-white/5 shadow-2xl transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="h-full flex flex-col p-4 md:p-6 overflow-hidden">
           <div className="mb-8 flex justify-between items-start">
             <Logo size="md" />
             <button onClick={() => setIsSidebarOpen(false)} className="md:hidden p-2 text-slate-400 hover:text-white">
@@ -159,8 +159,8 @@ const App: React.FC = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-cyan-400 transition-colors" size={16} />
             <input
               type="text"
-              placeholder="Buscar en el manual..."
-              className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all text-white placeholder:text-slate-600"
+              placeholder="Buscar tema..."
+              className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all text-white placeholder:text-slate-600"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -170,13 +170,13 @@ const App: React.FC = () => {
             <Navigation activeId={activeSectionId} onSelect={handleSectionSelect} />
           </div>
 
-          <div className="mt-6 pt-6 border-t border-white/5">
-            <div className="p-4 bg-white/5 rounded-2xl border border-white/5 flex items-center justify-between">
+          <div className="mt-4 pt-4 border-t border-white/5">
+            <div className="p-3 bg-white/5 rounded-xl border border-white/5 flex items-center justify-between">
               <div>
-                <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Documentación</p>
-                <span className="text-white font-bold text-xs flex items-center gap-1.5">v1.0 <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span> Stable</span>
+                <p className="text-[9px] text-slate-500 uppercase tracking-widest font-bold">Manual Técnico</p>
+                <span className="text-white font-bold text-[10px] flex items-center gap-1.5">v1.0 <span className="w-1 h-1 bg-emerald-400 rounded-full animate-pulse"></span></span>
               </div>
-              <BookOpen size={16} className="text-cyan-500" />
+              <BookOpen size={14} className="text-cyan-500" />
             </div>
           </div>
         </div>
@@ -191,7 +191,7 @@ const App: React.FC = () => {
           </div>
           <div className="flex items-center gap-4">
             <button className="bg-white text-black px-6 py-2.5 rounded-xl text-xs font-extrabold hover:bg-slate-200 transition-all flex items-center gap-2 shadow-lg shadow-white/5">
-              <Download size={14} /> Full Manual PDF
+              <Download size={14} /> Descargar PDF
             </button>
           </div>
         </header>
@@ -240,17 +240,6 @@ const App: React.FC = () => {
               <Card className="animate-slide-up">
                 <div className="space-y-4 text-slate-400 leading-relaxed text-lg font-light">
                   {activeSection.content.map((line, idx) => {
-                    // Logic to aggregate subsequent table lines
-                    if (line.startsWith('TABLE:')) {
-                      let tableLines = line;
-                      let k = idx + 1;
-                      while (k < activeSection.content.length && (activeSection.content[k].includes('|') || activeSection.content[k].trim() === "")) {
-                        tableLines += '\n' + activeSection.content[k];
-                        k++;
-                      }
-                      // We hackily skip aggregated lines by checking idx later or using a loop. 
-                      // For simplicity, we assume tables are single strings for now as provided in constants.
-                    }
                     return renderLine(line, idx);
                   })}
                 </div>

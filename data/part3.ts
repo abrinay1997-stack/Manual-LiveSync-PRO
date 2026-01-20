@@ -3,7 +3,7 @@ import { ManualPart } from '../types';
 
 export const part3: ManualPart = {
   id: "part-3",
-  title: "PARTE 3: SISTEMA PRINCIPAL, ESCENARIO Y CONTROL",
+  title: "SISTEMA PRINCIPAL, ESCENARIO Y CONTROL",
   sections: [
     {
       id: "pa-basic-config",

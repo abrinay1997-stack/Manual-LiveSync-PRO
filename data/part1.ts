@@ -3,7 +3,7 @@ import { ManualPart } from '../types';
 
 export const part1: ManualPart = {
   id: "part-1",
-  title: "PARTE 1: INTRODUCCIÓN Y HUB DE PROYECTOS",
+  title: "INTRODUCCIÓN Y HUB DE PROYECTOS",
   sections: [
     {
       id: "welcome",
