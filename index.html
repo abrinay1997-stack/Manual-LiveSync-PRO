@@ -41,8 +41,21 @@
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
 
+        /* Ocultar contenido de impresión en pantalla */
+        .print-only {
+            display: none !important;
+        }
+
         /* ESTILOS DE IMPRESIÓN OPTIMIZADOS */
         @media print {
+            /* Mostrar contenido de impresión, ocultar contenido de pantalla */
+            .print-only {
+                display: block !important;
+            }
+            .screen-only {
+                display: none !important;
+            }
+
             /* Ocultar elementos de navegación */
             aside, header, button, .fixed, .no-print, nav, .scroll-top-btn {
                 display: none !important;
