@@ -12,7 +12,6 @@ const App: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [isPrintMode, setIsPrintMode] = useState(false);
-  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setShowScrollTop(window.scrollY > 400);
@@ -52,26 +51,19 @@ const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Solución optimizada: Renderiza todo el manual y usa window.print() nativo del navegador
+  // Solución corregida: Renderiza todo oculto para impresión sin afectar la vista normal
   const handleDownloadPDF = () => {
-    // Activar modo impresión para renderizar TODO el manual
     setIsSidebarOpen(false);
     setIsPrintMode(true);
-    setIsDownloading(true);
-
-    // Scroll al inicio
     window.scrollTo({ top: 0, behavior: 'instant' });
 
-    // Esperar a que se renderice todo el contenido
+    // Pequeño delay para asegurar que el DOM se actualice
     setTimeout(() => {
       window.print();
 
-      // Desactivar modo impresión después de cerrar el diálogo
-      setTimeout(() => {
-        setIsPrintMode(false);
-        setIsDownloading(false);
-      }, 1000);
-    }, 500);
+      // Desactivar modo impresión cuando se cierra el diálogo
+      setIsPrintMode(false);
+    }, 300);
   };
 
   const renderUiLine = (line: string, idx: number) => {
@@ -139,25 +131,25 @@ const App: React.FC = () => {
             <h2 className="text-white font-bold text-lg">Manual del Ingeniero</h2>
             <p className="text-cyan-400 text-[10px] uppercase tracking-widest font-bold">LiveSync Pro Engineering</p>
           </div>
-          <button 
+          <button
             onClick={handleDownloadPDF}
-            disabled={isDownloading}
+            disabled={isPrintMode}
             className={`px-6 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shadow-xl ${
-              isDownloading ? 'bg-slate-700 text-slate-400' : 'bg-white text-black hover:bg-slate-200'
+              isPrintMode ? 'bg-slate-700 text-slate-400 cursor-wait' : 'bg-white text-black hover:bg-slate-200'
             }`}
           >
-            {isDownloading ? (
-              <><div className="animate-spin h-3.5 w-3.5 border-2 border-slate-400 border-t-transparent rounded-full"></div> Procesando 33 págs...</>
+            {isPrintMode ? (
+              <><div className="animate-spin h-3.5 w-3.5 border-2 border-slate-400 border-t-transparent rounded-full"></div> Preparando...</>
             ) : (
-              <><Download size={14} /> Exportar Manual (PDF)</>
+              <><Download size={14} /> Descargar PDF</>
             )}
           </button>
         </header>
 
         <div className="flex-1 p-6 md:p-12 lg:px-24 max-w-5xl mx-auto w-full pb-32">
-          {isPrintMode ? (
-            // Modo impresión: Renderizar TODO el manual completo
-            <div className="space-y-16">
+          {/* Contenido de impresión: Oculto en pantalla, visible solo al imprimir */}
+          {isPrintMode && (
+            <div className="print-only space-y-16" style={{ display: 'none' }}>
               {MANUAL_DATA.map((part, partIdx) => (
                 <div key={partIdx} className="space-y-8">
                   <div className="border-b border-gray-300 pb-4">
@@ -198,9 +190,10 @@ const App: React.FC = () => {
                 </div>
               ))}
             </div>
-          ) : (
-            // Modo normal: Mostrar solo la sección activa
-            <div className="animate-fade-in space-y-12">
+          )}
+
+          {/* Vista normal: Siempre visible en pantalla, oculta al imprimir */}
+          <div className={`animate-fade-in space-y-12 ${isPrintMode ? 'screen-only' : ''}`}>
               <div className="space-y-4">
                 <span className="text-cyan-400 text-[10px] uppercase font-bold tracking-[0.4em]">Sección {activeSection.id.toUpperCase()}</span>
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tighter leading-tight">
