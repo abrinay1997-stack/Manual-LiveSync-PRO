@@ -11,6 +11,7 @@ const App: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [isPrintMode, setIsPrintMode] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
@@ -51,106 +52,26 @@ const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Función crítica: Genera el HTML del manual como un string para asegurar que el contenido exista
-  const generateManualHtmlString = () => {
-    let html = `
-      <html>
-      <head>
-        <style>
-          body { font-family: Arial, sans-serif; color: black; background: white; margin: 0; padding: 0; }
-          .page { padding: 25mm; position: relative; page-break-after: always; }
-          .title-main { font-size: 48pt; color: #0ea5e9; text-align: center; margin-top: 80mm; font-weight: bold; }
-          .subtitle-main { font-size: 20pt; color: #64748b; text-align: center; margin-top: 10px; }
-          .section-title { font-size: 26pt; color: #0ea5e9; border-bottom: 2px solid #0ea5e9; margin: 30pt 0 15pt 0; font-weight: bold; }
-          .subsection-title { font-size: 16pt; font-weight: bold; margin: 20pt 0 10pt 0; color: #1e293b; }
-          .text { font-size: 11pt; line-height: 1.6; margin-bottom: 10pt; color: black; display: block; }
-          table { width: 100%; border-collapse: collapse; margin: 15pt 0; }
-          th, td { border: 1px solid #ccc; padding: 8pt; text-align: left; font-size: 10pt; }
-          th { background-color: #f8fafc; font-weight: bold; }
-          .code { background-color: #f1f5f9; border: 1px solid #cbd5e1; padding: 10pt; font-family: monospace; font-size: 9pt; margin: 10pt 0; white-space: pre-wrap; display: block; }
-          .bold { font-weight: bold; }
-        </style>
-      </head>
-      <body>
-        <div class="page">
-          <div class="title-main">LIVESYNC PRO</div>
-          <div class="subtitle-main">MANUAL TÉCNICO OFICIAL</div>
-          <div style="text-align: center; margin-top: 60mm; color: #94a3b8; font-size: 12pt;">
-            Engineering Suite - V1.0 Stable Build<br>
-            Generado el ${new Date().toLocaleDateString()}
-          </div>
-        </div>
-    `;
-
-    MANUAL_DATA.forEach(part => {
-      html += `<div class="page">
-        <div class="section-title">${part.title}</div>`;
-      
-      part.sections.forEach(section => {
-        html += `<div class="subsection-title">${section.title}</div>`;
-        section.content.forEach(line => {
-          if (line.startsWith('TABLE:')) {
-            const rows = line.replace('TABLE:', '').split('\n').filter(r => r.trim());
-            const data = rows.map(r => r.split('|').map(c => c.trim()));
-            html += `<table><thead><tr>${data[0].map(c => `<th>${c}</th>`).join('')}</tr></thead>`;
-            html += `<tbody>${data.slice(1).map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
-          } else if (line.startsWith('CODE:')) {
-            html += `<div class="code">${line.replace('CODE:', '')}</div>`;
-          } else {
-            const cleanText = line.replace(/\*\*(.*?)\*\*/g, '<span class="bold">$1</span>');
-            html += `<p class="text">${cleanText}</p>`;
-          }
-        });
-
-        section.subsections?.forEach(sub => {
-          html += `<div style="margin-top: 15pt; padding-left: 15pt; border-left: 2px solid #eee;">
-            <div style="font-weight: bold; font-size: 13pt; margin-bottom: 8pt;">${sub.title}</div>`;
-          sub.content.forEach(line => {
-             const cleanText = line.replace(/\*\*(.*?)\*\*/g, '<span class="bold">$1</span>');
-             html += `<p class="text">${cleanText}</p>`;
-          });
-          html += `</div>`;
-        });
-      });
-      html += `</div>`;
-    });
-
-    html += `</body></html>`;
-    return html;
-  };
-
-  const handleDownloadPDF = async () => {
+  // Solución optimizada: Renderiza todo el manual y usa window.print() nativo del navegador
+  const handleDownloadPDF = () => {
+    // Activar modo impresión para renderizar TODO el manual
+    setIsSidebarOpen(false);
+    setIsPrintMode(true);
     setIsDownloading(true);
-    try {
-      const htmlString = generateManualHtmlString();
-      const fileName = `Manual_LiveSync_Pro_${new Date().getFullYear()}.pdf`;
 
-      const opt = {
-        margin: 0,
-        filename: fileName,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
-          scale: 1.5, // Reducido para evitar fallos de memoria en 33 páginas
-          useCORS: true, 
-          letterRendering: true,
-          backgroundColor: '#ffffff'
-        },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: 'css' }
-      };
+    // Scroll al inicio
+    window.scrollTo({ top: 0, behavior: 'instant' });
 
-      const html2pdf = (window as any).html2pdf;
-      if (!html2pdf) throw new Error('Librería html2pdf no disponible');
+    // Esperar a que se renderice todo el contenido
+    setTimeout(() => {
+      window.print();
 
-      // Generamos el PDF directamente desde el STRING de HTML
-      await html2pdf().set(opt).from(htmlString).save();
-      console.log('✅ PDF generado exitosamente.');
-    } catch (error) {
-      console.error('❌ Error:', error);
-      alert('Error crítico al generar el PDF. El navegador podría estar sin memoria.');
-    } finally {
-      setIsDownloading(false);
-    }
+      // Desactivar modo impresión después de cerrar el diálogo
+      setTimeout(() => {
+        setIsPrintMode(false);
+        setIsDownloading(false);
+      }, 1000);
+    }, 500);
   };
 
   const renderUiLine = (line: string, idx: number) => {
@@ -234,51 +155,97 @@ const App: React.FC = () => {
         </header>
 
         <div className="flex-1 p-6 md:p-12 lg:px-24 max-w-5xl mx-auto w-full pb-32">
-          <div className="animate-fade-in space-y-12">
-            <div className="space-y-4">
-              <span className="text-cyan-400 text-[10px] uppercase font-bold tracking-[0.4em]">Sección {activeSection.id.toUpperCase()}</span>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tighter leading-tight">
-                {activeSection.title}
-              </h1>
-            </div>
-
-            <Card className="animate-slide-up">
-              <div className="space-y-4 text-slate-400 leading-relaxed text-lg font-light">
-                {activeSection.content.map((line, idx) => renderUiLine(line, idx))}
-              </div>
-
-              {activeSection.subsections?.map((sub, sidx) => (
-                <div key={sidx} className="mt-12 space-y-6 border-t border-white/5 pt-12">
-                  <h3 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
-                    <div className="w-2 h-2 rounded-full bg-cyan-500"></div>
-                    {sub.title}
-                  </h3>
-                  <div className="space-y-4 pl-0 md:pl-5">
-                    {sub.content.map((line, lidx) => renderUiLine(line, lidx + 1000))}
+          {isPrintMode ? (
+            // Modo impresión: Renderizar TODO el manual completo
+            <div className="space-y-16">
+              {MANUAL_DATA.map((part, partIdx) => (
+                <div key={partIdx} className="space-y-8">
+                  <div className="border-b border-gray-300 pb-4">
+                    <h1 className="text-4xl font-extrabold text-black tracking-tight">
+                      {part.title}
+                    </h1>
                   </div>
+
+                  {part.sections.map((section, secIdx) => (
+                    <div key={secIdx} className="space-y-6 no-break">
+                      <div className="space-y-3">
+                        <span className="text-xs uppercase font-bold text-gray-600 tracking-wider">
+                          Sección {section.id.toUpperCase()}
+                        </span>
+                        <h2 className="text-3xl font-bold text-black tracking-tight">
+                          {section.title}
+                        </h2>
+                      </div>
+
+                      <div className="space-y-4 text-black leading-relaxed">
+                        {section.content.map((line, idx) => renderUiLine(line, idx + secIdx * 1000))}
+                      </div>
+
+                      {section.subsections && section.subsections.length > 0 && (
+                        <div className="mt-8 space-y-8">
+                          {section.subsections.map((sub, sidx) => (
+                            <div key={sidx} className="space-y-4">
+                              <h3 className="text-2xl font-bold text-black">{sub.title}</h3>
+                              <div className="space-y-3 pl-4">
+                                {sub.content.map((line, lidx) => renderUiLine(line, lidx + sidx * 10000))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
               ))}
-            </Card>
-
-            <div className="pt-24 flex flex-col md:flex-row items-center justify-between gap-8 border-t border-white/5">
-              <button 
-                onClick={() => navigate('prev')}
-                disabled={currentSectionIndex === 0}
-                className={`flex flex-col items-start gap-1 group transition-all ${currentSectionIndex === 0 ? 'opacity-20 cursor-not-allowed' : 'hover:-translate-x-2'}`}
-              >
-                <span className="text-[10px] uppercase tracking-widest text-slate-600 font-bold">Anterior</span>
-                <div className="flex items-center gap-2 text-white font-bold text-xl"><ChevronLeft size={20} className="text-cyan-500" /> Atrás</div>
-              </button>
-              <button 
-                onClick={() => navigate('next')}
-                disabled={currentSectionIndex === allSections.length - 1}
-                className={`flex flex-col items-end gap-1 group transition-all ${currentSectionIndex === allSections.length - 1 ? 'opacity-20 cursor-not-allowed' : 'hover:translate-x-2'}`}
-              >
-                <span className="text-[10px] uppercase tracking-widest text-slate-600 font-bold">Siguiente</span>
-                <div className="flex items-center gap-2 text-white font-bold text-xl text-right">Continuar <ChevronRight size={20} className="text-purple-500" /></div>
-              </button>
             </div>
-          </div>
+          ) : (
+            // Modo normal: Mostrar solo la sección activa
+            <div className="animate-fade-in space-y-12">
+              <div className="space-y-4">
+                <span className="text-cyan-400 text-[10px] uppercase font-bold tracking-[0.4em]">Sección {activeSection.id.toUpperCase()}</span>
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tighter leading-tight">
+                  {activeSection.title}
+                </h1>
+              </div>
+
+              <Card className="animate-slide-up">
+                <div className="space-y-4 text-slate-400 leading-relaxed text-lg font-light">
+                  {activeSection.content.map((line, idx) => renderUiLine(line, idx))}
+                </div>
+
+                {activeSection.subsections?.map((sub, sidx) => (
+                  <div key={sidx} className="mt-12 space-y-6 border-t border-white/5 pt-12">
+                    <h3 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
+                      <div className="w-2 h-2 rounded-full bg-cyan-500"></div>
+                      {sub.title}
+                    </h3>
+                    <div className="space-y-4 pl-0 md:pl-5">
+                      {sub.content.map((line, lidx) => renderUiLine(line, lidx + 1000))}
+                    </div>
+                  </div>
+                ))}
+              </Card>
+
+              <div className="pt-24 flex flex-col md:flex-row items-center justify-between gap-8 border-t border-white/5 no-print">
+                <button
+                  onClick={() => navigate('prev')}
+                  disabled={currentSectionIndex === 0}
+                  className={`flex flex-col items-start gap-1 group transition-all ${currentSectionIndex === 0 ? 'opacity-20 cursor-not-allowed' : 'hover:-translate-x-2'}`}
+                >
+                  <span className="text-[10px] uppercase tracking-widest text-slate-600 font-bold">Anterior</span>
+                  <div className="flex items-center gap-2 text-white font-bold text-xl"><ChevronLeft size={20} className="text-cyan-500" /> Atrás</div>
+                </button>
+                <button
+                  onClick={() => navigate('next')}
+                  disabled={currentSectionIndex === allSections.length - 1}
+                  className={`flex flex-col items-end gap-1 group transition-all ${currentSectionIndex === allSections.length - 1 ? 'opacity-20 cursor-not-allowed' : 'hover:translate-x-2'}`}
+                >
+                  <span className="text-[10px] uppercase tracking-widest text-slate-600 font-bold">Siguiente</span>
+                  <div className="flex items-center gap-2 text-white font-bold text-xl text-right">Continuar <ChevronRight size={20} className="text-purple-500" /></div>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {showScrollTop && (
