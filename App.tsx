@@ -11,6 +11,7 @@ const App: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [isPrintMode, setIsPrintMode] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setShowScrollTop(window.scrollY > 400);
@@ -70,7 +71,22 @@ const App: React.FC = () => {
   };
 
   const handleDownloadPDF = () => {
-    window.print();
+    // Cerrar sidebar y activar modo impresión
+    setIsSidebarOpen(false);
+    setIsPrintMode(true);
+
+    // Scroll al inicio
+    window.scrollTo({ top: 0, behavior: 'instant' });
+
+    // Esperar a que se renderice todo el contenido
+    setTimeout(() => {
+      window.print();
+
+      // Desactivar modo impresión después de que se cierre el diálogo
+      setTimeout(() => {
+        setIsPrintMode(false);
+      }, 1000);
+    }, 500);
   };
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -230,6 +246,49 @@ const App: React.FC = () => {
                   <p className="text-slate-500">No encontramos coincidencias para esta búsqueda técnica.</p>
                 </div>
               )}
+            </div>
+          ) : isPrintMode ? (
+            // Modo impresión: Mostrar TODO el manual
+            <div className="space-y-16">
+              {MANUAL_DATA.map((part, partIdx) => (
+                <div key={partIdx} className="space-y-8">
+                  <div className="border-b border-gray-300 pb-4">
+                    <h1 className="text-4xl font-extrabold text-black tracking-tight">
+                      {part.title}
+                    </h1>
+                  </div>
+
+                  {part.sections.map((section, secIdx) => (
+                    <div key={secIdx} className="space-y-6 no-break">
+                      <div className="space-y-3">
+                        <span className="text-xs uppercase font-bold text-gray-600 tracking-wider">
+                          Sección {section.id.toUpperCase()}
+                        </span>
+                        <h2 className="text-3xl font-bold text-black tracking-tight">
+                          {section.title}
+                        </h2>
+                      </div>
+
+                      <div className="space-y-4 text-black leading-relaxed">
+                        {section.content.map((line, idx) => renderLine(line, idx + secIdx * 1000))}
+                      </div>
+
+                      {section.subsections && section.subsections.length > 0 && (
+                        <div className="mt-8 space-y-8">
+                          {section.subsections.map((sub, sidx) => (
+                            <div key={sidx} className="space-y-4">
+                              <h3 className="text-2xl font-bold text-black">{sub.title}</h3>
+                              <div className="space-y-3 pl-4">
+                                {sub.content.map((line, lidx) => renderLine(line, lidx + sidx * 10000))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ))}
             </div>
           ) : (
             <div className="animate-fade-in space-y-12">
