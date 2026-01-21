@@ -55,7 +55,7 @@ const App: React.FC = () => {
   const activeSection = useMemo(() => allSections[currentSectionIndex] || allSections[0], [currentSectionIndex, allSections]);
 
   const activePart = useMemo(() => {
-    return MANUAL_DATA.find(part => part.sections.some(s => s.id === activeSectionId));
+    return MANUAL_DATA.find(part => part.sections.some(section => section.id === activeSectionId));
   }, [activeSectionId]);
 
   const glossaryTerms = useMemo(() => {
@@ -83,7 +83,6 @@ const App: React.FC = () => {
     }
   };
 
-  // Mejora de detección de Swipe: Ignora si el usuario está haciendo scroll vertical
   const handleTouchStart = (e: React.TouchEvent) => { 
     touchStartX.current = e.touches[0].clientX; 
     touchStartY.current = e.touches[0].clientY; 
@@ -97,7 +96,6 @@ const App: React.FC = () => {
     const diffX = touchStartX.current - touchEndX;
     const diffY = touchStartY.current - touchEndY;
 
-    // Solo dispara si el movimiento horizontal es mayor al vertical (intención de swipe, no scroll)
     if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 80) {
       if (diffX > 0) navigate('next');
       else navigate('prev');
@@ -284,7 +282,7 @@ const App: React.FC = () => {
             
             <div className="mb-6 p-3 bg-white/[0.02] border border-white/5 rounded-2xl space-y-1">
               <p className="text-[9px] uppercase tracking-[0.2em] font-black text-slate-600 px-3 mb-2">Accesos Directos</p>
-              <a href="https://livesyncpro.com/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between group w-full px-3 py-2 rounded-xl hover:bg-white/5 transition-all">
+              <a href="https://livesyncpro.com/" className="flex items-center justify-between group w-full px-3 py-2 rounded-xl hover:bg-white/5 transition-all">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-purple-500/10 text-purple-400 rounded-lg group-hover:bg-purple-500 group-hover:text-black transition-all">
                     <Monitor size={14} />
@@ -293,7 +291,7 @@ const App: React.FC = () => {
                 </div>
                 <ExternalLink size={10} className="text-slate-700 group-hover:text-slate-400" />
               </a>
-              <a href="https://support.livesyncpro.com/#chat" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between group w-full px-3 py-2 rounded-xl hover:bg-white/5 transition-all">
+              <a href="https://support.livesyncpro.com/#chat" className="flex items-center justify-between group w-full px-3 py-2 rounded-xl hover:bg-white/5 transition-all">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-cyan-500/10 text-cyan-400 rounded-lg group-hover:bg-cyan-500 group-hover:text-black transition-all">
                     <MessageSquareDot size={14} />
@@ -302,7 +300,7 @@ const App: React.FC = () => {
                 </div>
                 <ExternalLink size={10} className="text-slate-700 group-hover:text-slate-400" />
               </a>
-              <a href="https://support.livesyncpro.com/#inicio" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between group w-full px-3 py-2 rounded-xl hover:bg-white/5 transition-all">
+              <a href="https://support.livesyncpro.com/#inicio" className="flex items-center justify-between group w-full px-3 py-2 rounded-xl hover:bg-white/5 transition-all">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-slate-500/10 text-slate-400 rounded-lg group-hover:bg-slate-500 group-hover:text-black transition-all">
                     <LifeBuoy size={14} />
