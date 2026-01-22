@@ -7,7 +7,7 @@ export const part1: ManualPart = {
   sections: [
     {
       id: "welcome",
-      title: "1. BIENVENIDA A LIVESYNC PRO",
+      title: "1. BIENVENIDO A LIVESYNC PRO",
       content: [
         "LiveSync Pro es una plataforma web profesional que permite a ingenieros de audio diseñar, calcular y optimizar sistemas completos de sonido para eventos en vivo. La aplicación combina física acústica avanzada, modelado atmosférico y cálculos de ingeniería para generar reportes técnicos profesionales (Technical Riders) con precisión científica.",
         "**¿Qué puedes hacer con LiveSync Pro?**",
