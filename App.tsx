@@ -1,19 +1,19 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Logo from './components/Logo';
-import Card from './components/Card';
 import Navigation from './components/Navigation';
 import { MANUAL_DATA } from './constants';
 import { SearchResult } from './types';
 import { part7 } from './data/part7';
 import { 
   Search, Menu, X, ArrowUpCircle, ChevronRight, ChevronLeft, 
-  Book, CheckCircle2, Copy, Info, List, Monitor, LifeBuoy, MessageSquareDot, ExternalLink
+  Book, CheckCircle2, Copy, Info, List, Monitor, LifeBuoy, MessageSquareDot, ExternalLink, LayoutGrid
 } from 'lucide-react';
 
 const App: React.FC = () => {
   const [activeSectionId, setActiveSectionId] = useState('welcome');
   const [searchQuery, setSearchQuery] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
@@ -70,6 +70,7 @@ const App: React.FC = () => {
   const handleSectionSelect = (id: string) => {
     setActiveSectionId(id);
     setIsSidebarOpen(false);
+    setIsRightSidebarOpen(false);
     setIsMobileSearchOpen(false);
     setSearchQuery('');
     setTooltip(null);
@@ -209,11 +210,14 @@ const App: React.FC = () => {
     <div 
       className="flex flex-col md:flex-row min-h-screen bg-[#050505] text-slate-400 font-sans selection:bg-cyan-500/30 selection:text-cyan-200 overflow-hidden"
     >
-      {/* Sidebar Backdrop */}
-      {isSidebarOpen && (
+      {/* Sidebars Backdrop */}
+      {(isSidebarOpen || isRightSidebarOpen) && (
         <div 
           className="fixed inset-0 bg-black/80 backdrop-blur-md z-[55] md:hidden animate-fade-in" 
-          onClick={() => setIsSidebarOpen(false)}
+          onClick={() => {
+            setIsSidebarOpen(false);
+            setIsRightSidebarOpen(false);
+          }}
         />
       )}
 
@@ -269,7 +273,7 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar Navigation (Left) */}
       <aside className={`fixed inset-y-0 left-0 z-[60] w-80 bg-[#080808] border-r border-white/5 transform transition-transform duration-500 md:relative md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="h-full flex flex-col overflow-hidden">
           <div className="p-6 pb-2">
@@ -280,37 +284,6 @@ const App: React.FC = () => {
               </button>
             </div>
             
-            <div className="mb-6 p-3 bg-white/[0.02] border border-white/5 rounded-2xl space-y-1">
-              <p className="text-[9px] uppercase tracking-[0.2em] font-black text-slate-600 px-3 mb-2">Accesos Directos</p>
-              <a href="https://livesyncpro.com/" className="flex items-center justify-between group w-full px-3 py-2 rounded-xl hover:bg-white/5 transition-all">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-purple-500/10 text-purple-400 rounded-lg group-hover:bg-purple-500 group-hover:text-black transition-all">
-                    <Monitor size={14} />
-                  </div>
-                  <span className="text-xs font-bold text-slate-400 group-hover:text-white">Aplicación</span>
-                </div>
-                <ExternalLink size={10} className="text-slate-700 group-hover:text-slate-400" />
-              </a>
-              <a href="https://support.livesyncpro.com/#chat" className="flex items-center justify-between group w-full px-3 py-2 rounded-xl hover:bg-white/5 transition-all">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-cyan-500/10 text-cyan-400 rounded-lg group-hover:bg-cyan-500 group-hover:text-black transition-all">
-                    <MessageSquareDot size={14} />
-                  </div>
-                  <span className="text-xs font-bold text-slate-400 group-hover:text-white">Chat Soporte</span>
-                </div>
-                <ExternalLink size={10} className="text-slate-700 group-hover:text-slate-400" />
-              </a>
-              <a href="https://support.livesyncpro.com/#inicio" className="flex items-center justify-between group w-full px-3 py-2 rounded-xl hover:bg-white/5 transition-all">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-slate-500/10 text-slate-400 rounded-lg group-hover:bg-slate-500 group-hover:text-black transition-all">
-                    <LifeBuoy size={14} />
-                  </div>
-                  <span className="text-xs font-bold text-slate-400 group-hover:text-white">Base Conocimiento</span>
-                </div>
-                <ExternalLink size={10} className="text-slate-700 group-hover:text-slate-400" />
-              </a>
-            </div>
-
             <div className="relative mb-4">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600" size={16} />
               <input
@@ -326,6 +299,54 @@ const App: React.FC = () => {
 
           <div className="flex-1 overflow-y-auto px-6 pr-2 custom-scrollbar">
             <Navigation activeId={activeSectionId} onSelect={handleSectionSelect} completedIds={completedSections} />
+          </div>
+        </div>
+      </aside>
+
+      {/* Right Sidebar (Accesos Directos) */}
+      <aside className={`fixed inset-y-0 right-0 z-[60] w-72 bg-[#080808] border-l border-white/5 transform transition-transform duration-500 ${isRightSidebarOpen ? 'translate-x-0' : 'translate-x-full'} md:hidden`}>
+        <div className="p-6 h-full flex flex-col">
+          <div className="flex items-center justify-between mb-8">
+            <span className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400">Utilidades</span>
+            <button onClick={() => setIsRightSidebarOpen(false)} className="text-slate-500 hover:text-white">
+              <X size={20} />
+            </button>
+          </div>
+          
+          <div className="space-y-3">
+            <p className="text-[9px] uppercase tracking-[0.2em] font-black text-slate-600 px-3 mb-2">Accesos Directos</p>
+            <a href="https://livesyncpro.com/" className="flex items-center justify-between group w-full px-4 py-3 rounded-2xl bg-white/[0.03] border border-white/5 hover:bg-white/5 transition-all">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-purple-500/10 text-purple-400 rounded-lg">
+                  <Monitor size={16} />
+                </div>
+                <span className="text-sm font-bold text-slate-300">Aplicación</span>
+              </div>
+              <ExternalLink size={12} className="text-slate-500" />
+            </a>
+            <a href="https://support.livesyncpro.com/#chat" className="flex items-center justify-between group w-full px-4 py-3 rounded-2xl bg-white/[0.03] border border-white/5 hover:bg-white/5 transition-all">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-cyan-500/10 text-cyan-400 rounded-lg">
+                  <MessageSquareDot size={16} />
+                </div>
+                <span className="text-sm font-bold text-slate-300">Chat Soporte</span>
+              </div>
+              <ExternalLink size={12} className="text-slate-500" />
+            </a>
+            <a href="https://support.livesyncpro.com/#inicio" className="flex items-center justify-between group w-full px-4 py-3 rounded-2xl bg-white/[0.03] border border-white/5 hover:bg-white/5 transition-all">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-slate-500/10 text-slate-400 rounded-lg">
+                  <LifeBuoy size={16} />
+                </div>
+                <span className="text-sm font-bold text-slate-300">Base Conocimiento</span>
+              </div>
+              <ExternalLink size={12} className="text-slate-500" />
+            </a>
+          </div>
+
+          <div className="mt-auto p-4 rounded-2xl bg-gradient-to-br from-cyan-500/10 to-purple-500/10 border border-white/5">
+             <div className="text-[9px] font-bold text-cyan-400 uppercase tracking-widest mb-2">LiveSync Cloud</div>
+             <p className="text-[10px] text-slate-500 leading-relaxed">Sincronización en tiempo real activa para usar en todos tus dispositivos.</p>
           </div>
         </div>
       </aside>
@@ -357,7 +378,13 @@ const App: React.FC = () => {
              </div>
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4">
+            <div className="hidden md:flex items-center gap-3 mr-4 p-1.5 px-3 bg-white/[0.03] border border-white/5 rounded-2xl">
+              <a href="https://livesyncpro.com/" className="text-slate-500 hover:text-cyan-400 transition-colors" title="Aplicación"><Monitor size={16} /></a>
+              <div className="w-px h-3 bg-white/10" />
+              <a href="https://support.livesyncpro.com/#chat" className="text-slate-500 hover:text-cyan-400 transition-colors" title="Chat Soporte"><MessageSquareDot size={16} /></a>
+            </div>
+
             <button 
               onClick={() => {
                 const prev = completedSections.includes(activeSectionId);
@@ -367,6 +394,15 @@ const App: React.FC = () => {
             >
               <CheckCircle2 size={18} />
             </button>
+            
+            {/* Shortcut Button for Mobile */}
+            <button 
+              onClick={() => setIsRightSidebarOpen(true)}
+              className="md:hidden p-2.5 rounded-xl text-slate-600 bg-white/5 hover:text-cyan-400 transition-all"
+            >
+              <LayoutGrid size={20} />
+            </button>
+
             <div className="hidden lg:flex items-center gap-3">
                <div className="h-1.5 w-24 bg-white/5 rounded-full overflow-hidden">
                  <div className="h-full bg-cyan-500 transition-all duration-700" style={{ width: `${(completedSections.length / allSections.length) * 100}%` }}></div>
@@ -391,7 +427,7 @@ const App: React.FC = () => {
               </div>
               
               <div className="space-y-6">
-                <h1 className="text-2xl md:text-4xl lg:text-6xl font-black text-white tracking-tighter leading-tight">
+                <h1 className="text-xl md:text-3xl lg:text-5xl font-black text-white tracking-tighter leading-tight">
                   {activeSection.title}
                 </h1>
               </div>
@@ -415,7 +451,7 @@ const App: React.FC = () => {
                 {activeSection.content.map((line, idx) => renderUiLine(line, idx))}
                 {activeSection.subsections?.map((sub, sidx) => (
                   <div key={sidx} id={`sub-${sidx}`} className="mt-20 space-y-8 border-t border-white/5 pt-20">
-                    <h3 className="text-xl md:text-2xl font-bold text-white tracking-tight flex items-center gap-4">
+                    <h3 className="text-lg md:text-xl font-bold text-white tracking-tight flex items-center gap-4">
                       <div className="w-1.5 h-6 bg-cyan-500 rounded-full"></div>
                       {sub.title}
                     </h3>
