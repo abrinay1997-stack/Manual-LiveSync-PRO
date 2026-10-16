@@ -22,5 +22,5 @@
     }
   },
   "include": ["./index.tsx", "./App.tsx", "./types.ts", "./constants.tsx", "./data/**/*.ts", "./components/**/*.tsx"],
-  "exclude": ["node_modules", "backend"]
+  "exclude": ["node_modules"]
 }
