@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import Logo from './components/Logo';
 import Navigation from './components/Navigation';
 import SearchResults from './components/SearchResults';
@@ -6,7 +6,8 @@ import SectionBody, { TermClickHandler } from './components/SectionBody';
 import { MANUAL_DATA } from './constants';
 import { part7 } from './data/part7';
 import { buildGlossaryMatcher, extractGlossary } from './lib/glossary';
-import { type ManualTarget, findPart, stripNumber, subsectionAnchor } from './lib/manual';
+import { type ManualTarget, anchorFor, findPart, parseAnchor, stripNumber, subsectionAnchor } from './lib/manual';
+import { loadProgress, saveProgress } from './lib/progress';
 import { type SearchResult, buildSearchIndex, searchManual } from './lib/search';
 import {
   Search, Menu, X, ArrowUpCircle, ChevronRight, ChevronLeft,
@@ -16,26 +17,55 @@ import {
 const GLOSSARY_SECTION_ID = part7.sections[0].id;
 const GLOSSARY = buildGlossaryMatcher(extractGlossary(part7.sections[0].content));
 const SEARCH_INDEX = buildSearchIndex(MANUAL_DATA);
+const ALL_SECTIONS = MANUAL_DATA.flatMap(part => part.sections);
+const SECTION_IDS: ReadonlySet<string> = new Set(ALL_SECTIONS.map(s => s.id));
+const DEFAULT_SECTION_ID = ALL_SECTIONS[0].id;
+const SITE_TITLE = 'Manual LiveSync Pro';
+
+/** Destino inicial según el hash de la URL (#seccion o #seccion-sub-N). */
+const INITIAL_TARGET: ManualTarget | null = parseAnchor(window.location.hash, ALL_SECTIONS);
+if (!INITIAL_TARGET && window.location.hash) {
+  // Enlace roto o antiguo: se limpia el hash para no arrastrarlo.
+  window.history.replaceState(null, '', window.location.pathname + window.location.search);
+}
+
+/**
+ * ¿El gesto empezó dentro de un elemento con scroll horizontal (tabla, bloque
+ * de código…)? En ese caso el deslizamiento es para desplazar ese elemento,
+ * no para cambiar de sección.
+ */
+function startsInHorizontalScroller(target: EventTarget | null, boundary: Element | null): boolean {
+  let el = target instanceof Element ? target : null;
+  while (el && el !== boundary) {
+    if (el.scrollWidth > el.clientWidth + 1) {
+      const overflowX = window.getComputedStyle(el).overflowX;
+      if (overflowX === 'auto' || overflowX === 'scroll') return true;
+    }
+    el = el.parentElement;
+  }
+  return false;
+}
 
 const App: React.FC = () => {
-  const [activeSectionId, setActiveSectionId] = useState('welcome');
+  const [activeSectionId, setActiveSectionId] = useState(INITIAL_TARGET?.sectionId ?? DEFAULT_SECTION_ID);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
-  const [completedSections, setCompletedSections] = useState<string[]>(() => {
-    const saved = localStorage.getItem('livesync_progress');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [completedSections, setCompletedSections] = useState<string[]>(() => loadProgress(SECTION_IDS));
   const [tooltip, setTooltip] = useState<{ text: string, term: string, x: number, y: number } | null>(null);
   
   /** Petición de desplazamiento tras cambiar de sección: ancla de subsección o null = inicio. */
-  const [scrollRequest, setScrollRequest] = useState<{ anchor: string | null; seq: number }>({ anchor: null, seq: 0 });
+  const [scrollRequest, setScrollRequest] = useState<{ anchor: string | null; seq: number }>(() =>
+    INITIAL_TARGET?.subIndex !== undefined
+      ? { anchor: subsectionAnchor(INITIAL_TARGET.sectionId, INITIAL_TARGET.subIndex), seq: 1 }
+      : { anchor: null, seq: 0 }
+  );
 
-  const touchStartX = useRef<number | null>(null);
-  const touchStartY = useRef<number | null>(null);
+  /** Inicio del gesto táctil; null si no hay gesto o si no debe cambiar de sección. */
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -58,12 +88,16 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('livesync_progress', JSON.stringify(completedSections));
+    saveProgress(completedSections);
   }, [completedSections]);
 
-  const allSections = useMemo(() => MANUAL_DATA.flatMap(part => part.sections), []);
-  const currentSectionIndex = useMemo(() => allSections.findIndex(s => s.id === activeSectionId), [activeSectionId, allSections]);
-  const activeSection = useMemo(() => allSections[currentSectionIndex] || allSections[0], [currentSectionIndex, allSections]);
+  const allSections = ALL_SECTIONS;
+  const currentSectionIndex = useMemo(() => Math.max(0, allSections.findIndex(s => s.id === activeSectionId)), [activeSectionId, allSections]);
+  const activeSection = allSections[currentSectionIndex];
+
+  useEffect(() => {
+    document.title = `${stripNumber(activeSection.title)} · ${SITE_TITLE}`;
+  }, [activeSection]);
 
   const activePart = useMemo(() => findPart(MANUAL_DATA, activeSection.id), [activeSection]);
 
@@ -77,7 +111,16 @@ const App: React.FC = () => {
     else container.scrollTo({ top: 0, behavior: 'smooth' });
   }, [scrollRequest]);
 
-  const goTo = (target: ManualTarget) => {
+  /**
+   * Abre una sección (y opcionalmente una subsección). Salvo que la navegación
+   * venga del propio hash, añade una entrada al historial con `#ancla` para que
+   * el enlace sea compartible y el botón «atrás» funcione.
+   */
+  const goTo = useCallback((target: ManualTarget, fromHash = false) => {
+    if (!fromHash) {
+      const hash = `#${anchorFor(target)}`;
+      if (window.location.hash !== hash) window.history.pushState(null, '', hash);
+    }
     setActiveSectionId(target.sectionId);
     setIsSidebarOpen(false);
     setIsRightSidebarOpen(false);
@@ -88,7 +131,18 @@ const App: React.FC = () => {
       anchor: target.subIndex === undefined ? null : subsectionAnchor(target.sectionId, target.subIndex),
       seq: prev.seq + 1
     }));
-  };
+  }, []);
+
+  // Atrás/adelante del navegador, enlaces "#ancla" internos o hash editado a mano.
+  useEffect(() => {
+    const onHashChange = () => {
+      const target = parseAnchor(window.location.hash, ALL_SECTIONS);
+      if (target) goTo(target, true);
+      else if (!window.location.hash) goTo({ sectionId: DEFAULT_SECTION_ID }, true);
+    };
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, [goTo]);
 
   const handleSectionSelect = (id: string) => goTo({ sectionId: id });
 
@@ -101,27 +155,29 @@ const App: React.FC = () => {
     }
   };
 
-  const handleTouchStart = (e: React.TouchEvent) => { 
-    touchStartX.current = e.touches[0].clientX; 
-    touchStartY.current = e.touches[0].clientY; 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    // Solo gestos de un dedo que no empiecen sobre una tabla/código desplazable.
+    if (e.touches.length !== 1 || startsInHorizontalScroller(e.target, e.currentTarget)) {
+      touchStart.current = null;
+      return;
+    }
+    touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
   };
-  
+
   const handleTouchEnd = (e: React.TouchEvent) => {
-    if (!touchStartX.current || !touchStartY.current) return;
-    const touchEndX = e.changedTouches[0].clientX;
-    const touchEndY = e.changedTouches[0].clientY;
-    
-    const diffX = touchStartX.current - touchEndX;
-    const diffY = touchStartY.current - touchEndY;
+    const start = touchStart.current;
+    touchStart.current = null;
+    if (!start) return;
+    const diffX = start.x - e.changedTouches[0].clientX;
+    const diffY = start.y - e.changedTouches[0].clientY;
 
     if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 80) {
       if (diffX > 0) navigate('next');
       else navigate('prev');
     }
-    
-    touchStartX.current = null;
-    touchStartY.current = null;
   };
+
+  const isActiveCompleted = completedSections.includes(activeSection.id);
 
   const searchResults = useMemo(() => searchManual(SEARCH_INDEX, searchQuery), [searchQuery]);
   const isSearching = searchQuery.trim() !== '';
@@ -327,10 +383,13 @@ const App: React.FC = () => {
 
             <button 
               onClick={() => {
-                const prev = completedSections.includes(activeSectionId);
-                setCompletedSections(prev ? completedSections.filter(s => s !== activeSectionId) : [...completedSections, activeSectionId]);
+                const id = activeSection.id;
+                setCompletedSections(prev => (prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]));
               }}
-              className={`p-2.5 rounded-xl transition-all ${completedSections.includes(activeSectionId) ? 'text-green-500 bg-green-500/10' : 'text-slate-600 bg-white/5 hover:text-white'}`}
+              aria-pressed={isActiveCompleted}
+              aria-label={isActiveCompleted ? 'Marcar sección como pendiente' : 'Marcar sección como leída'}
+              title={isActiveCompleted ? 'Leída' : 'Marcar como leída'}
+              className={`p-2.5 rounded-xl transition-all ${isActiveCompleted ? 'text-green-500 bg-green-500/10' : 'text-slate-600 bg-white/5 hover:text-white'}`}
             >
               <CheckCircle2 size={18} />
             </button>
@@ -359,6 +418,7 @@ const App: React.FC = () => {
           style={{ WebkitOverflowScrolling: 'touch' }}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
+          onTouchCancel={() => { touchStart.current = null; }}
         >
           <div className="p-6 md:p-12 lg:px-24 w-full pb-40">
             <div className="max-w-4xl mx-auto animate-fade-in space-y-12">
