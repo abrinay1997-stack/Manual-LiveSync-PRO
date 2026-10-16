@@ -341,8 +341,8 @@ const App: React.FC = () => {
           </div>
 
           <div className="mt-auto p-4 rounded-2xl bg-gradient-to-br from-cyan-500/10 to-purple-500/10 border border-white/5">
-             <div className="text-[9px] font-bold text-cyan-400 uppercase tracking-widest mb-2">LiveSync Cloud</div>
-             <p className="text-[10px] text-slate-500 leading-relaxed">Sincronización en tiempo real activa para usar en todos tus dispositivos.</p>
+             <div className="text-[9px] font-bold text-cyan-400 uppercase tracking-widest mb-2">Manual de usuario</div>
+             <p className="text-[10px] text-slate-500 leading-relaxed">Si algo de este manual no coincide con lo que ves en la aplicación, escríbenos desde el chat de soporte.</p>
           </div>
         </div>
       </aside>
