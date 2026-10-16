@@ -19,7 +19,7 @@ export const part1: ManualPart = {
         "• ✅ **Generar curvas de EQ:** Ecualización correctiva automática para torres de delay según la distancia y el entorno.",
         "• ✅ **Calcular infraestructura:** Análisis de carga eléctrica trifásica y seguridad en rigging.",
         "• ✅ **Exportar reportes técnicos:** Generación de archivos PDF profesionales y planos CAD (DXF).",
-        "• ✅ **Colaborar en tiempo real:** Gestión de equipos de hasta 5 personas para proyectos compartidos (Plan Corporativo)."
+        "• ✅ **Colaborar en equipo:** Proyectos compartidos con equipos de hasta 10 miembros (plan Corporativo PRO)."
       ]
     },
     {
@@ -29,22 +29,20 @@ export const part1: ManualPart = {
         "**2.1 Registro e Inicio de Sesión**",
         "Al ingresar a https://livesyncpro.com verás la Landing Page con información detallada sobre las capacidades de la suite. Para comenzar a trabajar:",
         "1. Haz clic en el botón **'Iniciar Sesión'** (ubicado en la esquina superior derecha).",
-        "2. Selecciona tu método de autenticación:",
-        "• **Google OAuth:** (Recomendado) Login instantáneo con tu cuenta profesional de Google.",
-        "• **Email/Password:** Registro manual mediante correo electrónico y contraseña verificada.",
+        "2. Pulsa **'Continuar con Google'** e inicia sesión con tu cuenta de Google. La primera vez se crea tu cuenta de LiveSync Pro automáticamente.",
         "",
         "**2.2 Planes de Suscripción**",
-        "LiveSync Pro ofrece niveles de servicio adaptados a la escala de tu producción:",
-        "TABLE:Plan | Precio | Características Principales",
-        "Trial | Gratis | 0 Proyectos, acceso limitado a base de datos de altavoces.",
-        "Standard | $99/año | Proyectos ilimitados, exportación completa PDF/CAD.",
-        "Corporate | $499/año | Gestión de equipos (5 licencias), proyectos compartidos en tiempo real.",
-        "Partner | Custom | Licencias personalizadas para empresas de renta y universidades.",
+        "LiveSync Pro ofrece tres planes anuales (precios en USD):",
+        "TABLE:Plan | Precio | Características principales",
+        "Core | $97/año | Licencia individual con acceso completo a la suite: todos los módulos de cálculo, exportación PDF y CAD (DXF), actualizaciones y soporte técnico.",
+        "Partner Estándar | $199/año | Ficha en el directorio de proveedores (búsqueda por ciudad y contacto directo) + 1 licencia Pro incluida.",
+        "Corporativo PRO | $499/año | Gestión de equipos de hasta 10 miembros con proyectos compartidos, posicionamiento destacado en el directorio y perfil verificado.",
+        "",
+        "Las suscripciones se pagan con tarjeta a través de Stripe y se renuevan automáticamente cada año. Puedes cancelarlas cuando quieras desde el gestor de suscripción de la aplicación.",
         "",
         "**Estado de Suscripción:**",
-        "• 🟢 **Activo:** Acceso total a todas las funciones de diseño y exportación.",
-        "• 🔴 **Expirado:** Requiere renovación. La aplicación entra en modo 'Solo Lectura' permitiendo ver proyectos viejos pero no crear nuevos ni editar.",
-        "Tu estado se visualiza permanentemente en la esquina superior derecha mediante un indicador visual de color."
+        "• 🟢 **Activa:** Acceso total a todas las funciones de diseño, cálculo y exportación.",
+        "• 🔴 **Sin licencia vigente** (cuenta nueva, expirada o cancelada): al entrar verás la pantalla de licencia, desde la que puedes contratar un plan, canjear una clave de licencia o unirte a un equipo con su código de invitación. Tus proyectos siguen guardados en la nube y vuelven a estar disponibles al reactivar la licencia."
       ]
     },
     {
@@ -58,7 +56,7 @@ export const part1: ManualPart = {
         "• **Título 'Project Hub':** Indica que te encuentras en la raíz de tus archivos.",
         "• **Widget de Equipo:** Muestra el estado de tu suscripción corporativa y miembros activos.",
         "• **Barra de Búsqueda:** Filtro inteligente por nombre de proyecto o cliente.",
-        "• **Botón de Sincronización ⟳:** Fuerza la actualización de datos con la base de datos Supabase.",
+        "• **Botón de Sincronización ⟳:** Fuerza la actualización de tus proyectos con la nube.",
         "• **Botón 'Nuevo Proyecto':** Botón cyan para iniciar un flujo de diseño desde cero.",
         "",
         "**B. Grilla de Proyectos (Project Grid):**",
@@ -85,9 +83,9 @@ export const part1: ManualPart = {
             "**Campo 2: Cliente (Opcional)**",
             "• Nombre de la empresa que solicita el diseño técnico.",
             "**Campo 3: Compartir con el Equipo**",
-            "• ☑ **Activado:** El proyecto se crea automáticamente como un recurso compartido para los miembros de tu licencia Corporate.",
+            "• ☑ **Activado:** El proyecto se crea como proyecto compartido (TEAM), visible para todos los miembros de tu equipo.",
             "• ☐ **Desactivado:** El proyecto será estrictamente privado.",
-            "**Nota:** Este checkbox solo aparece si tienes una suscripción Corporate activa.",
+            "**Nota:** Esta opción solo aparece si perteneces a un equipo (plan Corporativo PRO).",
             "3. Haz clic en **'Crear Proyecto'**. El sistema generará el espacio de trabajo y te redirigirá a la Vista de Configuración."
           ]
         },
@@ -106,7 +104,7 @@ export const part1: ManualPart = {
         {
           title: "3.4 Sincronización en la Nube (Data Engine)",
           content: [
-            "LiveSync Pro utiliza tecnología de sincronización en tiempo real basada en **Supabase**.",
+            "Tus proyectos se guardan mediante **sincronización en la nube**, asociados a tu cuenta.",
             "• **Auto-guardado:** Cada parámetro modificado se guarda automáticamente en la nube cada 2 segundos de inactividad.",
             "• **Sincronización Bidireccional:** Si editas desde una tablet, los cambios aparecerán en tu laptop al recargar.",
             "• **Estados del Indicador:**",
@@ -129,16 +127,16 @@ export const part1: ManualPart = {
         "• ✅ **Eficiencia Técnica:** Un ingeniero puede diseñar el PA mientras otro ajusta las torres de delay en el mismo archivo.",
         "",
         "**4.2 Crear un Equipo**",
-        "• **Requisitos:** Suscripción 'Corporate' activa y no pertenecer a otro equipo.",
-        "• **Proceso:** En el Project Hub, haz clic en **'Crear Equipo'**. El sistema generará un **Código de Invitación Único** (formato: team_xxx_yyy).",
-        "• ⚠️ **CRÍTICO:** Este código es la única forma de acceder. Guárdalo en un lugar seguro.",
+        "• **Requisitos:** Suscripción **Corporativo PRO** activa y no pertenecer a otro equipo.",
+        "• **Proceso:** En el Project Hub, haz clic en **'Crear Equipo'**. El sistema generará un **Código de Invitación** único.",
+        "• ⚠️ **Importante:** Cualquiera que tenga el código puede solicitar unirse mientras haya plazas libres. Compártelo solo con tu equipo.",
         "",
         "**4.3 Invitar Miembros**",
         "1. El **Owner** (Propietario) copia el código de invitación.",
         "2. Compártelo con tus técnicos mediante servicios de mensajería seguros.",
         "3. El invitado debe ir a su propio Project Hub y hacer clic en **'Unirse a Equipo'**.",
-        "4. Al ingresar el código, su cuenta se transformará automáticamente a Corporate (heredando los privilegios del Owner) y tendrá acceso a la pestaña TEAM.",
-        "**Límite de Miembros:** Máximo 5 personas por equipo (1 Owner + 4 Members)."
+        "4. Al ingresar el código, su cuenta queda vinculada al equipo: hereda el acceso de la licencia Corporativo PRO del Owner y ve los proyectos TEAM.",
+        "**Límite de Miembros:** Máximo 10 miembros por equipo, incluido el Owner."
       ],
       subsections: [
         {
@@ -146,15 +144,15 @@ export const part1: ManualPart = {
           content: [
             "El **Owner** tiene acceso al Panel de Gestión de Equipo donde puede:",
             "• **Ver Miembros:** Lista completa con emails y avatares.",
-            "• **Expulsar Miembros (🚫):** Revoca el acceso de un técnico al instante. Su cuenta volverá a estado 'Trial' o 'Expired'.",
-            "• **Disolver Equipo:** Acción irreversible que expulsa a todos los miembros y elimina el grupo de colaboración.",
+            "• **Expulsar Miembros (🚫):** Revoca al instante el acceso que el técnico heredaba del equipo; sus proyectos compartidos pasan a ser privados.",
+            "• **Disolver Equipo:** Acción irreversible que expulsa a todos los miembros y elimina el grupo de colaboración. El Owner conserva su licencia Corporativo PRO.",
             "",
             "**4.5 Salir de un Equipo (Member):**",
-            "Si eres miembro y deseas retirarte, haz clic en el icono de salida 🚪 en el widget de equipo. **Advertencia:** Perderás acceso inmediato a todos los proyectos marcados como TEAM y tu suscripción caducará."
+            "Si eres miembro y deseas retirarte, haz clic en el icono de salida 🚪 en el widget de equipo. **Advertencia:** Perderás de inmediato el acceso a los proyectos TEAM y la licencia heredada del equipo (necesitarás un plan propio para seguir usando la aplicación). Tus proyectos compartidos pasan a ser privados."
           ]
         },
         {
-          title: "4.7 Proyectos PRIV vs TEAM",
+          title: "4.6 Proyectos PRIV vs TEAM",
           content: [
             "**Proyectos Privados (🔒 PRIV):**",
             "• Solo visibles en el Hub de quien los creó.",
