@@ -21,6 +21,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["./index.tsx", "./App.tsx", "./types.ts", "./constants.tsx", "./data/**/*.ts", "./components/**/*.tsx"],
+  "include": ["./index.tsx", "./App.tsx", "./types.ts", "./constants.tsx", "./data/**/*.ts", "./lib/**/*.ts", "./components/**/*.tsx"],
   "exclude": ["node_modules"]
 }

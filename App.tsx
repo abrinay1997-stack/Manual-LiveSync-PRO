@@ -1,13 +1,19 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Logo from './components/Logo';
 import Navigation from './components/Navigation';
+import SectionBody, { TermClickHandler } from './components/SectionBody';
 import { MANUAL_DATA } from './constants';
 import { SearchResult } from './types';
 import { part7 } from './data/part7';
-import { 
-  Search, Menu, X, ArrowUpCircle, ChevronRight, ChevronLeft, 
-  Book, CheckCircle2, Copy, Info, List, Monitor, LifeBuoy, MessageSquareDot, ExternalLink, LayoutGrid
+import { buildGlossaryMatcher, extractGlossary } from './lib/glossary';
+import { subsectionAnchor } from './lib/manual';
+import {
+  Search, Menu, X, ArrowUpCircle, ChevronRight, ChevronLeft,
+  Book, CheckCircle2, Info, List, Monitor, LifeBuoy, MessageSquareDot, ExternalLink, LayoutGrid
 } from 'lucide-react';
+
+const GLOSSARY_SECTION_ID = part7.sections[0].id;
+const GLOSSARY = buildGlossaryMatcher(extractGlossary(part7.sections[0].content));
 
 const App: React.FC = () => {
   const [activeSectionId, setActiveSectionId] = useState('welcome');
@@ -57,15 +63,6 @@ const App: React.FC = () => {
   const activePart = useMemo(() => {
     return MANUAL_DATA.find(part => part.sections.some(section => section.id === activeSectionId));
   }, [activeSectionId]);
-
-  const glossaryTerms = useMemo(() => {
-    const terms: Record<string, string> = {};
-    part7.sections[0].content.forEach(line => {
-      const match = line.match(/• \*\*(.*?)\*\*:(.*)/);
-      if (match) terms[match[1].toLowerCase()] = match[2].trim();
-    });
-    return terms;
-  }, []);
 
   const handleSectionSelect = (id: string) => {
     setActiveSectionId(id);
@@ -120,90 +117,10 @@ const App: React.FC = () => {
     return results.slice(0, 10);
   }, [searchQuery]);
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-  };
-
-  const handleTermClick = (e: React.MouseEvent, term: string) => {
+  const handleTermClick: TermClickHandler = (e, entry) => {
     e.preventDefault();
-    const cleanTerm = term.toLowerCase().replace(/[.,]/g, '');
-    const definition = glossaryTerms[cleanTerm];
-    if (definition) {
-      setTooltip({ text: definition, term: term, x: e.clientX, y: e.clientY });
-    }
-  };
-
-  const renderUiLine = (line: string, idx: number) => {
-    if (line.startsWith('TABLE:')) {
-      const rows = line.replace('TABLE:', '').split('\n').filter(r => r.trim());
-      const data = rows.map(r => r.split('|').map(c => c.trim()));
-      return (
-        <div key={idx} className="my-8 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.01]">
-          <div className="hidden md:block overflow-x-auto">
-            <table className="w-full text-sm text-left">
-              <thead className="bg-white/5 text-white uppercase text-[10px] tracking-widest">
-                <tr>{data[0].map((cell, i) => <th key={i} className="px-5 py-4 font-bold border-b border-white/10">{cell}</th>)}</tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {data.slice(1).map((row, ri) => (
-                  <tr key={ri} className="hover:bg-white/[0.03] transition-colors">
-                    {row.map((cell, ci) => <td key={ci} className="px-5 py-4 text-slate-300">{cell}</td>)}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div className="md:hidden divide-y divide-white/5">
-            {data.slice(1).map((row, ri) => (
-              <div key={ri} className="p-5 space-y-3 bg-white/[0.02]">
-                {row.map((cell, ci) => (
-                  <div key={ci} className="flex flex-col gap-1">
-                    <span className="text-[10px] text-slate-600 font-bold uppercase tracking-widest">{data[0][ci]}</span>
-                    <span className="text-white text-sm font-medium">{cell}</span>
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
-      );
-    }
-    if (line.startsWith('CODE:')) {
-      const codeText = line.replace('CODE:', '');
-      return (
-        <div key={idx} className="group relative my-6 font-mono text-[11px] md:text-xs bg-black/60 p-5 rounded-xl border border-cyan-500/30 text-cyan-400 overflow-x-auto">
-          <button onClick={() => copyToClipboard(codeText)} className="absolute top-3 right-3 p-2 bg-white/5 hover:bg-white/10 rounded-lg text-white md:opacity-0 group-hover:opacity-100 transition-opacity">
-            <Copy size={14} />
-          </button>
-          {codeText}
-        </div>
-      );
-    }
-    
-    const parts = line.split(' ');
-    return (
-      <p key={idx} className="my-4 leading-[1.8] text-slate-300 text-base md:text-lg">
-        {parts.map((word, i) => {
-          const cleanWord = word.replace(/[**.,()]/g, '').toLowerCase();
-          const hasDefinition = glossaryTerms[cleanWord];
-          const isBold = word.startsWith('**') && word.endsWith('**');
-          const text = word.replace(/\*\*/g, '');
-
-          if (hasDefinition) {
-            return (
-              <button 
-                key={i} 
-                onClick={(e) => handleTermClick(e, cleanWord)}
-                className="inline border-b border-dotted border-cyan-500/60 text-cyan-200/90 hover:text-cyan-400 hover:border-solid transition-all text-left font-inherit p-0 m-0 cursor-help"
-              >
-                {text}{' '}
-              </button>
-            );
-          }
-          return isBold ? <strong key={i} className="text-white font-bold">{text} </strong> : text + ' ';
-        })}
-      </p>
-    );
+    const rect = e.currentTarget.getBoundingClientRect();
+    setTooltip({ text: entry.definition, term: entry.term, x: rect.left, y: rect.bottom });
   };
 
   return (
@@ -230,7 +147,7 @@ const App: React.FC = () => {
               w-full md:w-80 bg-[#121212] border-t md:border border-white/10 p-6 shadow-2xl animate-slide-up md:animate-fade-in
               rounded-t-[32px] md:rounded-2xl md:fixed md:pointer-events-auto
             `}
-            style={window.innerWidth >= 768 ? { left: Math.min(tooltip.x + 20, window.innerWidth - 340), top: tooltip.y + 20 } : {}}
+            style={window.innerWidth >= 768 ? { left: Math.max(16, Math.min(tooltip.x, window.innerWidth - 340)), top: Math.min(tooltip.y + 8, window.innerHeight - 240) } : {}}
           >
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2 text-cyan-400 font-bold uppercase tracking-widest text-[10px]">
@@ -439,7 +356,7 @@ const App: React.FC = () => {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {activeSection.subsections.map((sub, i) => (
-                      <a key={i} href={`#sub-${i}`} className="text-sm text-slate-400 hover:text-cyan-400 transition-colors flex items-center gap-2">
+                      <a key={i} href={`#${subsectionAnchor(activeSection.id, i)}`} className="text-sm text-slate-400 hover:text-cyan-400 transition-colors flex items-center gap-2">
                         <ChevronRight size={14} className="text-slate-800" /> {sub.title}
                       </a>
                     ))}
@@ -447,18 +364,11 @@ const App: React.FC = () => {
                 </div>
               )}
 
-              <div className="text-slate-300">
-                {activeSection.content.map((line, idx) => renderUiLine(line, idx))}
-                {activeSection.subsections?.map((sub, sidx) => (
-                  <div key={sidx} id={`sub-${sidx}`} className="mt-20 space-y-8 border-t border-white/5 pt-20">
-                    <h3 className="text-lg md:text-xl font-bold text-white tracking-tight flex items-center gap-4">
-                      <div className="w-1.5 h-6 bg-cyan-500 rounded-full"></div>
-                      {sub.title}
-                    </h3>
-                    <div>{sub.content.map((line, lidx) => renderUiLine(line, lidx + 5000))}</div>
-                  </div>
-                ))}
-              </div>
+              <SectionBody
+                section={activeSection}
+                glossary={activeSection.id === GLOSSARY_SECTION_ID ? null : GLOSSARY}
+                onTermClick={handleTermClick}
+              />
 
               <div className="pt-24 grid grid-cols-1 md:grid-cols-2 gap-4">
                 {currentSectionIndex > 0 ? (
