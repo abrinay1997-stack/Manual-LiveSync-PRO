@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MANUAL_DATA } from '../constants';
+import { stripNumber } from '../lib/manual';
 import { ChevronDown, Layers, CheckCircle2 } from 'lucide-react';
 
 interface NavigationProps {
@@ -59,7 +60,7 @@ const Navigation: React.FC<NavigationProps> = ({ activeId, onSelect, completedId
                   <span className={`text-[9px] uppercase tracking-[0.2em] font-black transition-colors ${
                     hasActiveSection ? 'text-cyan-500' : 'text-slate-700'
                   }`}>
-                    {part.id.replace('part-', 'PARTE ')}
+                    {part.label}
                   </span>
                   <h4 className={`text-[11px] uppercase tracking-wider font-bold text-left transition-colors truncate max-w-[160px] ${
                     hasActiveSection ? 'text-white' : 'text-slate-500 group-hover/part:text-slate-300'
@@ -97,7 +98,7 @@ const Navigation: React.FC<NavigationProps> = ({ activeId, onSelect, completedId
                         <div className="absolute left-0 w-1 h-4 bg-cyan-500 rounded-full animate-pulse"></div>
                       )}
                       <span className="truncate mr-2">
-                        {section.title.split('. ')[1] || section.title}
+                        {stripNumber(section.title)}
                       </span>
                       {isCompleted && <CheckCircle2 size={12} className="text-green-500/60 shrink-0" />}
                     </button>

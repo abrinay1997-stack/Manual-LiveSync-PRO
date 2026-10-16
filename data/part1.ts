@@ -1,8 +1,10 @@
 
-import { ManualPart } from '../types';
+import type { ManualPart } from '../types';
 
 export const part1: ManualPart = {
   id: "part-1",
+  number: 1,
+  label: "PARTE 1",
   title: "INTRODUCCIÓN Y HUB DE PROYECTOS",
   sections: [
     {

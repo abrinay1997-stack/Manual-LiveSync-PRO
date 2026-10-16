@@ -1,5 +1,5 @@
 
-import { ManualPart } from './types';
+import type { ManualPart } from './types';
 import { part1 } from './data/part1';
 import { part2 } from './data/part2';
 import { part5 } from './data/part5';

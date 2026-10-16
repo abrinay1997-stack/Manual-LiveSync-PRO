@@ -1,7 +1,9 @@
-import { ManualPart } from '../types';
+import type { ManualPart } from '../types';
 
 export const part7: ManualPart = {
   id: "part-7",
+  number: 5,
+  label: "ANEXO",
   title: "GLOSARIO TÉCNICO Y FÓRMULAS",
   sections: [
     {

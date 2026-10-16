@@ -1,12 +1,13 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Logo from './components/Logo';
 import Navigation from './components/Navigation';
+import SearchResults from './components/SearchResults';
 import SectionBody, { TermClickHandler } from './components/SectionBody';
 import { MANUAL_DATA } from './constants';
-import { SearchResult } from './types';
 import { part7 } from './data/part7';
 import { buildGlossaryMatcher, extractGlossary } from './lib/glossary';
-import { subsectionAnchor } from './lib/manual';
+import { type ManualTarget, findPart, stripNumber, subsectionAnchor } from './lib/manual';
+import { type SearchResult, buildSearchIndex, searchManual } from './lib/search';
 import {
   Search, Menu, X, ArrowUpCircle, ChevronRight, ChevronLeft,
   Book, CheckCircle2, Info, List, Monitor, LifeBuoy, MessageSquareDot, ExternalLink, LayoutGrid
@@ -14,6 +15,7 @@ import {
 
 const GLOSSARY_SECTION_ID = part7.sections[0].id;
 const GLOSSARY = buildGlossaryMatcher(extractGlossary(part7.sections[0].content));
+const SEARCH_INDEX = buildSearchIndex(MANUAL_DATA);
 
 const App: React.FC = () => {
   const [activeSectionId, setActiveSectionId] = useState('welcome');
@@ -29,6 +31,9 @@ const App: React.FC = () => {
   });
   const [tooltip, setTooltip] = useState<{ text: string, term: string, x: number, y: number } | null>(null);
   
+  /** Petición de desplazamiento tras cambiar de sección: ancla de subsección o null = inicio. */
+  const [scrollRequest, setScrollRequest] = useState<{ anchor: string | null; seq: number }>({ anchor: null, seq: 0 });
+
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -60,19 +65,34 @@ const App: React.FC = () => {
   const currentSectionIndex = useMemo(() => allSections.findIndex(s => s.id === activeSectionId), [activeSectionId, allSections]);
   const activeSection = useMemo(() => allSections[currentSectionIndex] || allSections[0], [currentSectionIndex, allSections]);
 
-  const activePart = useMemo(() => {
-    return MANUAL_DATA.find(part => part.sections.some(section => section.id === activeSectionId));
-  }, [activeSectionId]);
+  const activePart = useMemo(() => findPart(MANUAL_DATA, activeSection.id), [activeSection]);
 
-  const handleSectionSelect = (id: string) => {
-    setActiveSectionId(id);
+  // Desplaza al inicio o a la subsección pedida una vez renderizada la sección.
+  useEffect(() => {
+    if (scrollRequest.seq === 0) return;
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    const el = scrollRequest.anchor ? document.getElementById(scrollRequest.anchor) : null;
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    else container.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [scrollRequest]);
+
+  const goTo = (target: ManualTarget) => {
+    setActiveSectionId(target.sectionId);
     setIsSidebarOpen(false);
     setIsRightSidebarOpen(false);
     setIsMobileSearchOpen(false);
     setSearchQuery('');
     setTooltip(null);
-    scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    setScrollRequest(prev => ({
+      anchor: target.subIndex === undefined ? null : subsectionAnchor(target.sectionId, target.subIndex),
+      seq: prev.seq + 1
+    }));
   };
+
+  const handleSectionSelect = (id: string) => goTo({ sectionId: id });
+
+  const handleResultSelect = (result: SearchResult) => goTo({ sectionId: result.section.id, subIndex: result.subIndex });
 
   const navigate = (direction: 'next' | 'prev') => {
     const nextIdx = direction === 'next' ? currentSectionIndex + 1 : currentSectionIndex - 1;
@@ -103,19 +123,8 @@ const App: React.FC = () => {
     touchStartY.current = null;
   };
 
-  const filteredResults = useMemo(() => {
-    if (!searchQuery.trim() || searchQuery.length < 2) return [];
-    const q = searchQuery.toLowerCase();
-    const results: SearchResult[] = [];
-    MANUAL_DATA.forEach(part => {
-      part.sections.forEach(section => {
-        if (section.title.toLowerCase().includes(q) || section.content.some(c => c.toLowerCase().includes(q))) {
-          results.push({ partTitle: part.title, section, matchType: section.title.toLowerCase().includes(q) ? 'title' : 'content' });
-        }
-      });
-    });
-    return results.slice(0, 10);
-  }, [searchQuery]);
+  const searchResults = useMemo(() => searchManual(SEARCH_INDEX, searchQuery), [searchQuery]);
+  const isSearching = searchQuery.trim() !== '';
 
   const handleTermClick: TermClickHandler = (e, entry) => {
     e.preventDefault();
@@ -166,26 +175,24 @@ const App: React.FC = () => {
       {isMobileSearchOpen && (
         <div className="fixed inset-0 z-[110] bg-[#050505] animate-fade-in flex flex-col p-6">
           <div className="flex items-center gap-4 mb-8">
-            <button onClick={() => setIsMobileSearchOpen(false)} className="text-slate-400"><ChevronLeft size={24} /></button>
+            <button onClick={() => setIsMobileSearchOpen(false)} className="text-slate-400" aria-label="Cerrar búsqueda"><ChevronLeft size={24} /></button>
             <div className="flex-1 relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan-500" size={18} />
               <input 
                 autoFocus
-                type="text" 
-                placeholder="Buscar..." 
+                type="search"
+                enterKeyHint="search"
+                aria-label="Buscar en el manual"
+                placeholder="Buscar en el manual..."
                 className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-12 pr-4 text-white focus:outline-none"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Escape') setIsMobileSearchOpen(false); }}
               />
             </div>
           </div>
-          <div className="flex-1 overflow-y-auto space-y-4">
-            {filteredResults.map((result, idx) => (
-              <button key={idx} onClick={() => handleSectionSelect(result.section.id)} className="w-full text-left p-4 bg-white/5 rounded-2xl border border-white/5">
-                <div className="text-cyan-400 text-[10px] font-bold uppercase mb-1">{result.partTitle}</div>
-                <div className="text-white font-bold">{result.section.title}</div>
-              </button>
-            ))}
+          <div className="flex-1 overflow-y-auto">
+            <SearchResults query={searchQuery} results={searchResults} onSelect={handleResultSelect} />
           </div>
         </div>
       )}
@@ -204,18 +211,34 @@ const App: React.FC = () => {
             <div className="relative mb-4">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600" size={16} />
               <input
-                type="text"
+                type="search"
+                aria-label="Buscar en el manual"
                 placeholder="Buscar..."
-                className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-3 pl-12 pr-4 text-sm text-white focus:outline-none focus:border-cyan-500/50 transition-all"
+                className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-3 pl-12 pr-10 text-sm text-white focus:outline-none focus:border-cyan-500/50 transition-all [&::-webkit-search-cancel-button]:hidden"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                onFocus={() => { if(window.innerWidth < 768) setIsMobileSearchOpen(true); }}
+                onKeyDown={(e) => { if (e.key === 'Escape') setSearchQuery(''); }}
+                onFocus={() => { if (window.innerWidth < 768) setIsMobileSearchOpen(true); }}
               />
+              {isSearching && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  aria-label="Limpiar búsqueda"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-500 hover:text-white transition-colors"
+                >
+                  <X size={14} />
+                </button>
+              )}
             </div>
           </div>
 
           <div className="flex-1 overflow-y-auto px-6 pr-2 custom-scrollbar">
-            <Navigation activeId={activeSectionId} onSelect={handleSectionSelect} completedIds={completedSections} />
+            {isSearching ? (
+              <SearchResults query={searchQuery} results={searchResults} onSelect={handleResultSelect} compact />
+            ) : (
+              <Navigation activeId={activeSection.id} onSelect={handleSectionSelect} completedIds={completedSections} />
+            )}
           </div>
         </div>
       </aside>
@@ -340,7 +363,7 @@ const App: React.FC = () => {
           <div className="p-6 md:p-12 lg:px-24 w-full pb-40">
             <div className="max-w-4xl mx-auto animate-fade-in space-y-12">
               <div className="md:hidden text-[10px] font-bold text-slate-700 uppercase tracking-[0.2em]">
-                 {activePart?.id.replace('part-', 'P')} • {activePart?.title}
+                 {activePart?.label} • {activePart?.title}
               </div>
               
               <div className="space-y-6">
@@ -378,7 +401,7 @@ const App: React.FC = () => {
                     </div>
                     <div className="flex-1 overflow-hidden">
                       <span className="text-[10px] font-bold text-slate-600 uppercase tracking-widest block mb-1">Anterior</span>
-                      <span className="text-white font-bold block truncate">{allSections[currentSectionIndex - 1].title.split('. ')[1] || 'Atrás'}</span>
+                      <span className="text-white font-bold block truncate">{stripNumber(allSections[currentSectionIndex - 1].title)}</span>
                     </div>
                   </button>
                 ) : <div />}
@@ -387,7 +410,7 @@ const App: React.FC = () => {
                   <button onClick={() => navigate('next')} className="flex items-center justify-between p-6 rounded-3xl bg-white/[0.02] border border-white/5 hover:border-purple-500/50 hover:bg-purple-500/5 transition-all text-right group">
                     <div className="flex-1 overflow-hidden">
                       <span className="text-[10px] font-bold text-slate-600 uppercase tracking-widest block mb-1">Siguiente</span>
-                      <span className="text-white font-bold block truncate">{allSections[currentSectionIndex + 1].title.split('. ')[1] || 'Continuar'}</span>
+                      <span className="text-white font-bold block truncate">{stripNumber(allSections[currentSectionIndex + 1].title)}</span>
                     </div>
                     <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-slate-500 group-hover:text-purple-400 group-hover:bg-purple-500/10 transition-all ml-4">
                       <ChevronRight size={24} />
