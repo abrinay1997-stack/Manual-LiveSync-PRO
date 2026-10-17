@@ -24,8 +24,9 @@ repo aporta el contenido del manual a esa plataforma vía `knowledge/manual.json
 ## 2. Stack y comandos
 
 - React 19 + TypeScript 5 + Vite 5, `lucide-react` para iconos.
-- Tailwind **por CDN** (`<script src="https://cdn.tailwindcss.com">` en `index.html`); estilos
-  globales y animaciones en el `<style>` de `index.html`.
+- Tailwind 3.4 **compilado** en el build (`tailwind.config.js`, `postcss.config.js`, `index.css`).
+  Las clases deben aparecer completas en el código (nada de `text-${color}`). Estilos globales y
+  animaciones en el `<style>` de `index.html`. Sin CDN de terceros en runtime salvo el logo.
 - Node 22 (igual que Netlify).
 
 ```bash
@@ -147,7 +148,6 @@ Inline: `**negrita**`, `*cursiva*`, `` `código` `` (anidables: `**a *b* c**`). 
 
 ## 7. Pendientes conocidos
 
-- Tailwind por CDN (no recomendado en producción): migrar a Tailwind compilado con Vite.
 - El logo (`components/Logo.tsx`) se carga desde un CDN externo (aweber; desde el entorno de
   agentes el host no resolvía el 2026-10-17). Si falla se muestra `public/favicon.svg`; subir el
   PNG original a `public/` cuando el dueño lo aporte.
