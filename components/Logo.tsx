@@ -1,6 +1,8 @@
 
 import React from 'react';
 
+const LOGO_URL = 'https://hostedimages-cdn.aweber-static.com/MjM0MTQ0NQ==/optimized/20657f92efa544489526caee3beef9d2.png';
+
 interface LogoProps {
   size?: 'sm' | 'md' | 'lg';
   className?: string;
@@ -21,10 +23,14 @@ const Logo: React.FC<LogoProps> = ({ size = 'md', className = '' }) => {
         <div className="absolute inset-0 bg-cyan-500 blur-xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
         
         {/* Imagen del Logo actuando como ícono */}
-        <img 
-          src="https://hostedimages-cdn.aweber-static.com/MjM0MTQ0NQ==/optimized/20657f92efa544489526caee3beef9d2.png" 
-          alt="Icon" 
+        <img
+          src={LOGO_URL}
+          alt="Icon"
           className="relative w-full h-full object-contain opacity-90"
+          onError={(e) => {
+            // Si el CDN externo falla, icono local (relativo: vale en / y en /manual/).
+            if (!e.currentTarget.src.endsWith('favicon.svg')) e.currentTarget.src = 'favicon.svg';
+          }}
         />
       </div>
 

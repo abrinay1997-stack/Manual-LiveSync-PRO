@@ -133,15 +133,27 @@ Inline: `**negrita**`, `*cursiva*`, `` `código` `` (anidables: `**a *b* c**`). 
   `npm ci && npm run build && npx wrangler deploy` (requiere `CLOUDFLARE_API_TOKEN` y
   `CLOUDFLARE_ACCOUNT_ID`). En el entorno cloud de agentes `api.cloudflare.com` está
   bloqueado: despliega con GitHub Actions o con el conector de Cloudflare.
-- Las anclas usan el hash (`#id`), así que los enlaces profundos funcionan en ambos sin
-  reglas de servidor. Sourcemaps desactivados en producción (`vite.config.ts`).
+- **Plataforma unificada (destino final): `livesyncpro.com/manual/`.** La app principal compila
+  este repo con `SITE_URL=https://livesyncpro.com/manual/ vite build --outDir <app>/dist/manual`
+  (`LiveSync-Pro/scripts/build-platform.mjs`) y lo sirve desde su mismo Worker. Por eso
+  `vite.config.ts` usa `base: './'`: todo recurso referenciado desde código debe ser **relativo**
+  (`favicon.svg`, no `/favicon.svg`; Vite reescribe el `index.html`). `__SITE_URL__` en
+  `index.html` (canonical, og:url) se sustituye en el build; por defecto el subdominio actual.
+  El CI de la app clona este repo (público) en cada despliegue. Tras el corte de DNS,
+  `manual.livesyncpro.com/*` debe redirigir a `livesyncpro.com/manual/` (el hash se conserva).
+- Las anclas usan el hash (`#id`), así que los enlaces profundos funcionan en todos los destinos
+  sin reglas de servidor. Las citas del asistente de IA enlazan a `/manual/#<id>`.
+  Sourcemaps desactivados en producción (`vite.config.ts`).
 
 ## 7. Pendientes conocidos
 
 - Tailwind por CDN (no recomendado en producción): migrar a Tailwind compilado con Vite.
-- El logo (`components/Logo.tsx`) se carga desde un CDN externo (aweber): alojarlo en `public/`.
+- El logo (`components/Logo.tsx`) se carga desde un CDN externo (aweber; desde el entorno de
+  agentes el host no resolvía el 2026-10-17). Si falla se muestra `public/favicon.svg`; subir el
+  PNG original a `public/` cuando el dueño lo aporte.
 - `npm audit`: aviso moderado de `esbuild` (solo afecta al servidor de desarrollo); se resuelve
   al subir a Vite 6+.
 - Revisar con la app el resto de secciones (configuración, reportes) tras las correcciones de
   física del motor (ver auditoría en `LiveSync-Pro/docs/auditorias/`).
-- Integrar el manual dentro de la plataforma unificada en Cloudflare.
+- Integración en la plataforma unificada: hecha en el build de la app (`/manual/`); falta el
+  corte de DNS y la redirección del subdominio.
