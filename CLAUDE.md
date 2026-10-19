@@ -26,7 +26,7 @@ repo aporta el contenido del manual a esa plataforma vía `knowledge/manual.json
 - React 19 + TypeScript 5 + Vite 5, `lucide-react` para iconos.
 - Tailwind 3.4 **compilado** en el build (`tailwind.config.js`, `postcss.config.js`, `index.css`).
   Las clases deben aparecer completas en el código (nada de `text-${color}`). Estilos globales y
-  animaciones en el `<style>` de `index.html`. Sin CDN de terceros en runtime salvo el logo.
+  animaciones en el `<style>` de `index.html`. Sin CDN de terceros en runtime.
 - Node 22 (igual que Netlify).
 
 ```bash
@@ -62,7 +62,7 @@ constants.tsx           MANUAL_DATA: orden de las partes
 types.ts                ManualPart / ManualSection / ManualSubsection
 scripts/export-manual.mjs  Exportador a knowledge/manual.jsonl
 knowledge/manual.jsonl  Generado; se versiona
-public/                 favicon.svg (Vite lo copia a dist/)
+public/                 logo-livesyncpro.png, favicon.png, apple-touch-icon.png (Vite los copia a dist/)
 ```
 
 Los nombres `part1, part2, part5, part6, part7` son históricos: el orden real lo dan
@@ -148,9 +148,8 @@ Inline: `**negrita**`, `*cursiva*`, `` `código` `` (anidables: `**a *b* c**`). 
 
 ## 7. Pendientes conocidos
 
-- El logo (`components/Logo.tsx`) se carga desde un CDN externo (aweber; desde el entorno de
-  agentes el host no resolvía el 2026-10-17). Si falla se muestra `public/favicon.svg`; subir el
-  PNG original a `public/` cuando el dueño lo aporte.
+- Logo local desde el 2026-10-19 (`public/logo-livesyncpro.png`, 256 px, generado del original del
+  dueño; también `favicon.png` y `apple-touch-icon.png`). Ya no hay CDN de terceros en runtime.
 - `npm audit`: aviso moderado de `esbuild` (solo afecta al servidor de desarrollo); se resuelve
   al subir a Vite 6+.
 - Revisar con la app el resto de secciones (configuración, reportes) tras las correcciones de

@@ -1,7 +1,8 @@
 
 import React from 'react';
 
-const LOGO_URL = 'https://hostedimages-cdn.aweber-static.com/MjM0MTQ0NQ==/optimized/20657f92efa544489526caee3beef9d2.png';
+// Logo local (relativo al documento: vale en / y en /manual/). Original del dueño, 256 px.
+const LOGO_URL = 'logo-livesyncpro.png';
 
 interface LogoProps {
   size?: 'sm' | 'md' | 'lg';
@@ -17,7 +18,7 @@ const Logo: React.FC<LogoProps> = ({ size = 'md', className = '' }) => {
 
   return (
     <div className={`flex flex-col items-center select-none ${className}`}>
-      {/* Ícono (Imagen externa con efecto de resplandor de la guía) */}
+      {/* Ícono (logo con efecto de resplandor de la guía) */}
       <div className={`relative ${iconSize} ${spacing} group`}>
         {/* Resplandor (Glow) */}
         <div className="absolute inset-0 bg-cyan-500 blur-xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
@@ -27,10 +28,6 @@ const Logo: React.FC<LogoProps> = ({ size = 'md', className = '' }) => {
           src={LOGO_URL}
           alt="Icon"
           className="relative w-full h-full object-contain opacity-90"
-          onError={(e) => {
-            // Si el CDN externo falla, icono local (relativo: vale en / y en /manual/).
-            if (!e.currentTarget.src.endsWith('favicon.svg')) e.currentTarget.src = 'favicon.svg';
-          }}
         />
       </div>
 
