@@ -138,7 +138,7 @@ Inline: `**negrita**`, `*cursiva*`, `` `código` `` (anidables: `**a *b* c**`). 
   este repo con `SITE_URL=https://livesyncpro.com/manual/ vite build --outDir <app>/dist/manual`
   (`LiveSync-Pro/scripts/build-platform.mjs`) y lo sirve desde su mismo Worker. Por eso
   `vite.config.ts` usa `base: './'`: todo recurso referenciado desde código debe ser **relativo**
-  (`favicon.svg`, no `/favicon.svg`; Vite reescribe el `index.html`). `__SITE_URL__` en
+  (`logo-livesyncpro.png`, no `/logo-livesyncpro.png`; Vite reescribe el `index.html`). `__SITE_URL__` en
   `index.html` (canonical, og:url) se sustituye en el build; por defecto el subdominio actual.
   El CI de la app clona este repo (público) en cada despliegue. Tras el corte de DNS,
   `manual.livesyncpro.com/*` debe redirigir a `livesyncpro.com/manual/` (el hash se conserva).
