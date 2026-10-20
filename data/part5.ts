@@ -178,7 +178,7 @@ export const part5: ManualPart = {
         "**18.1 Columnas de la Tabla**",
         "• **ID:** Nombre del sistema (ej: \"Main PA L/R\", \"Torre Centro\").",
         "• **Dist. Real (Slant) [m]:** Distancia real tridimensional (hipotenusa) desde el PA principal considerando altura.",
-        "• **Delay Time [ms]:** Tiempo de retardo requerido. **Color verde brillante:** Valor a programar en el DSP. Incluye el Precedence Effect (Haas) configurado.",
+        "• **Delay Time [ms]:** Tiempo de retardo requerido. **Color verde brillante:** Valor a programar en el DSP. Incluye el Precedence Effect (Haas) configurado y, si hay que retrasar el main para alinear los subwoofers (subs detrás del PA o end-fire), también ese retardo: la fila **Main PA** muestra cuánto se retrasa el main.",
         "• **Predicción SPL [dB]:** Nivel esperado. 🟠 **Naranja (<85dB):** Sistema lejano o con bajo headroom. ⚠️ **Icono advertencia:** Headroom insuficiente.",
         "• **Gain Trim [dB]:** Ajuste de nivel sugerido (Gain Shading) para que, en el punto de referencia detrás de la torre, la torre quede **+3 dB sobre el Main PA** si llega dentro de la ventana de precedencia de Haas (5–30 ms), o a igual nivel si no. Ambos niveles se comparan en LAeq dB(A) por bandas de 1/3 de octava, con la suma caja a caja y la directividad nominal de cada elemento (estimación; la torre se supone recta, sin inclinación).",
         "• **Air Loss (12k) [dB]:** Pérdida atmosférica acumulada a 12 kHz (ISO 9613-1)."
