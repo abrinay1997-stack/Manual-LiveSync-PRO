@@ -108,8 +108,9 @@ Inline: `**negrita**`, `*cursiva*`, `` `código` `` (anidables: `**a *b* c**`). 
 1. **El manual debe coincidir con la app real**: comportamiento, nombres de botones, límites y
    precios. Antes de documentar algo, verifícalo en el código de `LiveSync-Pro`
    (p. ej. `components/LandingPage.tsx`, `App.tsx`, `components/ProjectHub.tsx`, `worker/src/routes/`).
-   Planes vigentes (Stripe): **Core $97/año**, **Partner Estándar $199/año**,
-   **Corporativo PRO $499/año** (equipos de hasta 10 miembros, incluido el Owner).
+   Planes vigentes (Stripe, desde el 2026-10-20), cada uno **mensual o anual**: **Pro $20/mes o $199/año**,
+   **Partner $25/mes o $249/año**, **Corporativo PRO $99/mes o $990/año** (equipos de hasta 10 miembros,
+   incluido el Owner). Fuente de los importes en la app: `LiveSync-Pro/lib/plan.ts` (`PLAN_PRICES`).
    Inicio de sesión: solo Google. No menciones proveedores internos (p. ej. Supabase): usa
    "sincronización en la nube".
 2. **Idioma**: contenido y UI en **español**; código e identificadores en inglés.
