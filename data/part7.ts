@@ -18,7 +18,7 @@ export const part7: ManualPart = {
         "• **Altitud (m):** Metros sobre el nivel del mar. Reduce la presión atmosférica. LiveSync ajusta automáticamente la velocidad del sonido y absorción.",
         "• **Velocidad del Viento (m/s):** Afecta la propagación: 0-3 m/s (sin impacto), 5.5-10 m/s (refracción significativa), >10 m/s (PELIGRO ESTRUCTURAL), >15 m/s (CRÍTICO - BAJAR PA).",
         "• **Dirección del Viento:** 0° (Viento de frente), 180° (Viento de cola - PELIGROSO), 90°/270° (Viento cruzado), Tailwind (hacia abajo), Headwind (hacia arriba).",
-        "• **Tipo de Suelo (Ground Type):** grass (absorbe graves), concrete (altamente reflectivo), sand (muy absorbente), asfalto, crowd (multitud de pie).",
+        "• **Tipo de Suelo (Ground Type):** opción **Superficie Suelo** de la app; fija la resistividad al flujo del suelo (σ) con la que se calcula el efecto suelo, según las clases de Nord2000 / CNOSSOS-EU: **Césped** (clase D, 200 kPa·s/m²), **Césped compactado (festival)** (clase E, 500 kPa·s/m², recinto pisado), **Concreto / Asfalto** (clase H, muy reflectivo), **Arena** (estimación, clase D) y **Público** (estimación: en graves, hasta unos 180 Hz, cuenta el suelo de debajo; por encima de unos 350 Hz se toma la clase más blanda, A, y entre ambos hay una transición).",
         "• **Ground Effect:** Comb filtering causado por la interferencia entre el sonido directo y el reflejado en el suelo. Crea notches (caídas) en frecuencias específicas.",
         "",
         "**👥 CONTROL DE OCUPACIÓN Y PÚBLICO**",
@@ -111,6 +111,7 @@ export const part7: ManualPart = {
         "• **Damping Factor (DF):** `DF = Z_speaker / (Z_amp_output + R_cable)`",
         "• **Caída Voltaje (%):** `V_drop% = (R_cable / (R_cable + Z_speaker)) × 100`",
         "• **Carga por Punto (kg):** `Load = (ArrayWeight + Gear) × 1.25 / Points`",
+        "• **Reparto entre motores (kg):** `F_tras = W × (x_CdG − x_del) / (x_tras − x_del)`, `F_del = W − F_tras` (equilibrio de momentos ΣM = 0; x = distancia detrás de la bisagra frontal).",
         "• **Generador (kVA):** `kVA = (TotalWatts / 1000) × 1.25 / PowerFactor`"
       ]
     }

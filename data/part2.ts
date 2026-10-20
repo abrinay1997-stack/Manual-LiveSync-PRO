@@ -184,17 +184,18 @@ export const part2: ManualPart = {
         "• **Uso:** Eventos sin micrófonos sensibles, DJs.",
         "",
         "**2. Cardioide Invertido (CSA)**",
-        "• **Config:** 2 frente + 1 atrás invertido (ratio 2:1).",
+        "• **Config:** fila frontal + fila trasera con polaridad invertida y retardo d/c (LiveSync reparte las cajas 60/40 entre las filas).",
         "• Cancelación de fase activa en la parte trasera.",
-        "• **Rechazo trasero:** ~15dB.",
-        "• **Pérdida al frente:** -3dB vs omni.",
+        "• **Rechazo trasero:** lo calcula LiveSync para tu arreglo; en el proyecto de referencia (8 + 4 cajas), unos 10 dB en la banda de 63 Hz a 30 m.",
+        "• **Pérdida al frente:** pequeña (≈ 1 dB(A) en el proyecto de referencia), porque la fila trasera también suma hacia delante en la frecuencia de diseño.",
         "• **Uso:** Orquestas, pop, corporate (micrófonos en escenario).",
         "",
         "**3. End-Fire Line**",
         "• Fila india con delays progresivos.",
         "• Máximo 'tiro' (throw) y rechazo trasero.",
-        "• **Rechazo trasero:** ~12-20dB.",
+        "• **Rechazo trasero:** lo calcula LiveSync; con 12 cajas, unos 18 dB en la banda de 63 Hz a 30 m.",
         "• **Requiere:** Mucho espacio físico (profundidad).",
+        "• **Delays:** la caja más trasera dispara primero y cada caja hacia delante se retrasa d/c (≈ 4.4 ms por cada 1.5 m). La delantera lleva el mayor retardo, (N−1)·d/c, y LiveSync lo incluye en el delay sub↔main.",
         "• **Uso:** EDM/Festivals con necesidad de impacto a larga distancia.",
         "",
         "**H. Cantidad Total Subs**",
@@ -204,7 +205,8 @@ export const part2: ManualPart = {
         "**LiveSync calcula automáticamente:**",
         "• SPL máximo teórico (suma coherente).",
         "• Spacing requerido para configuración cardioide.",
-        "• Delays para end-fire."
+        "• Delays para end-fire.",
+        "• El mapa, el panel de análisis y el PDF suman cada sub con su posición, retardo y polaridad. Supuestos: paso de 1.5 m entre cajas y entre filas, y cada caja como fuente omnidireccional (el proyecto no guarda la geometría real del arreglo)."
       ]
     },
     {
@@ -536,7 +538,7 @@ export const part2: ManualPart = {
         "1. **Delay Time (ms):** Tiempo de retardo requerido para alinear temporalmente la torre con el PA principal, basado en:",
         "CODE:Delay = (Slant Distance / Speed of Sound) × 1000 ms",
         "2. **SPL en Objetivo:** Nivel de presión sonora que la torre produce en su zona objetivo.",
-        "3. **Gain Trim (dB):** Ajuste de nivel sugerido para que la torre tenga **+3dB sobre el Main PA** en su zona de transición (Gain Shading).",
+        "3. **Gain Trim (dB):** Ajuste de nivel sugerido (Gain Shading) para que, en el punto de referencia detrás de la torre, la torre quede **+3 dB sobre el Main PA** si llega dentro de la ventana de precedencia de Haas (5–30 ms), o a igual nivel si no. Ambos niveles se comparan en LAeq dB(A) por bandas de 1/3 de octava, con la suma caja a caja y la directividad nominal de cada elemento (estimación; la torre se supone recta, sin inclinación).",
         "4. **Atmospheric Loss:** Pérdida por frecuencia según ISO 9613-1 (temperatura, humedad, altitud).",
         "5. **Headroom Warning:** Alerta si el sistema requiere más SPL del que físicamente puede producir.",
         "",
@@ -642,7 +644,20 @@ export const part2: ManualPart = {
         "",
         "**11.3.2 Motores por Array (Main)**",
         "• **1 Motor:** Array ligero (<150kg). Mayor stress en un solo punto.",
-        "• **2 Motores:** Estándar para arrays medianos/grandes. Distribución de carga y mayor estabilidad. ✅ **Recomendado para line arrays profesionales**."
+        "• **2 Motores:** Estándar para arrays medianos/grandes. Distribución de carga y mayor estabilidad. ✅ **Recomendado para line arrays profesionales**.",
+        "",
+        "**11.3.3 Puntos Delantero y Trasero del Bumper (solo con 2 motores)**",
+        "Distancia de cada punto de colgado detrás de la bisagra frontal de la primera caja, medida a lo largo del bumper (consulta la hoja del fabricante). Con los dos datos, LiveSync calcula la carga real de cada motor a partir del centro de gravedad del array; si los dejas vacíos, supone reparto igual entre los dos motores.",
+        "• El motor más cargado se compara con la capacidad por punto (SWL).",
+        "• Si el centro de gravedad queda fuera del tramo entre los dos puntos aparece el aviso **MOTOR DELANTERO SIN CARGA** o **MOTOR TRASERO SIN CARGA**: con dos cadenas verticales el array no mantiene el ángulo de sitio (mueve un punto o usa pull-back).",
+        "",
+        "**11.3.4 Mecánica del Array (resultado)**",
+        "En la columna de logística del análisis y en el PDF aparece el bloque **Mecánica del array**: una estimación de sólido rígido en 2D (estática ΣF = 0, ΣM = 0) con la misma cadena de cajas que usa la acústica.",
+        "• **Centro de gravedad:** metros detrás y por debajo de la bisagra frontal de la primera caja.",
+        "• **Pickpoint único:** dónde colgar con un solo punto para obtener el ángulo de sitio pedido.",
+        "• **Motores (delantero / trasero):** reparto de la carga con el factor dinámico (solo si indicaste los puntos del bumper).",
+        "• **Eslabones:** el superior (bumper–caja 1, que lleva todas las cajas) y el más cargado: eslabón trasero por lado (tracción o compresión) y pasador frontal por lado.",
+        "**Límites:** centro de gravedad de cada caja supuesto en el centro de su sección, masa del bumper genérica, sin dinámica ni viento en el reparto y sin el WLL de los eslabones del fabricante. Solo se calcula para modelos con el fondo de la caja publicado. **No sustituye al software oficial del fabricante ni a un rigger certificado.**"
       ]
     },
     {
