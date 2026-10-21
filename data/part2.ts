@@ -743,6 +743,23 @@ export const part2: ManualPart = {
             "2. Te redirige automáticamente a la **vista de Resultados**.",
             "3. Muestra el **Reporte Técnico completo** con todas las métricas calculadas."
           ]
+        },
+        {
+          title: "12.5 Panel de Hallazgos y Pruebas",
+          content: [
+            "Al abrir los resultados, el primer bloque es el **panel 'Hallazgos y pruebas'**: reúne en un solo sitio lo que el sistema ha detectado, ordenado por importancia.",
+            "**Pestaña Hallazgos**",
+            "• **Críticos** (rojo): problemas de seguridad o que impiden el objetivo (p. ej. rigging sobrecargado, tierra sin verificar, red saturada, viento por encima del límite operativo).",
+            "• **Avisos** (ámbar): conviene revisarlos (p. ej. factor de amortiguamiento bajo, fases desequilibradas, torre sin alcanzar su zona).",
+            "• **Recomendaciones** (cian): mejoras opcionales.",
+            "• **Información** (oculta por defecto): limitaciones del motor y datos de contexto.",
+            "Cada hallazgo se despliega con el detalle, *qué hacer*, los parámetros implicados y la referencia. Los filtros de arriba muestran u ocultan cada nivel.",
+            "**Pestaña Pruebas**",
+            "Comprobaciones de coherencia que recalculan resultados con **fórmulas independientes** del motor (velocidad del sonido con temperatura, humedad y altitud; distancia oblicua de las torres; retardo sub↔main; carga de rigging) y los comparan con la salida real. Indican cuántas se superaron, cuántas fallaron y cuántas son **no concluyentes** (no hay una referencia independiente fiable: no se dan por aprobadas). **No sustituyen la validación contra mediciones de campo.**",
+            "**Pestaña Cambios**",
+            "El historial de los cambios hechos con el asistente guiado (*antes → después*, y si vienen de la IA). Cada conjunto tiene **Deshacer**; el proyecto en la nube se actualiza solo.",
+            "**Exportar:** en 'Detalle técnico' (al pie del panel) está el botón 'Exportar registro (JSON)'."
+          ]
         }
       ]
     }

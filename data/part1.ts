@@ -80,19 +80,18 @@ export const part1: ManualPart = {
         {
           title: "3.2 Crear un Proyecto Nuevo",
           content: [
-            "Para iniciar un diseño, sigue estos pasos:",
+            "Crear un proyecto son **dos pasos cortos**:",
+            "**Paso 1 — Cliente y nombre**",
             "1. Haz clic en el botón **'Nuevo Proyecto'** (Cyan, esquina superior derecha).",
-            "2. Se abrirá un modal interactivo con el formulario de registro:",
-            "**Campo 1: Nombre del Evento / Proyecto (Obligatorio)**",
-            "• Ingresa el nombre técnico del evento. Evita caracteres especiales.",
-            "• *Ejemplos:* 'Gira 2025 - Auditorio Nacional', 'Evento Corporativo Banco X'.",
-            "**Campo 2: Cliente (Opcional)**",
-            "• Nombre de la empresa que solicita el diseño técnico.",
-            "**Campo 3: Compartir con el Equipo**",
-            "• ☑ **Activado:** El proyecto se crea como proyecto compartido (TEAM), visible para todos los miembros de tu equipo.",
-            "• ☐ **Desactivado:** El proyecto será estrictamente privado.",
-            "**Nota:** Esta opción solo aparece si perteneces a un equipo (plan Corporativo PRO).",
-            "3. Haz clic en **'Crear Proyecto'**. El sistema generará el espacio de trabajo y te redirigirá a la Vista de Configuración."
+            "2. Se abre un modal con dos campos:",
+            "• **Cliente (opcional):** la empresa o artista que solicita el diseño técnico.",
+            "• **Nombre del proyecto (obligatorio):** el nombre técnico del evento. Evita caracteres especiales. *Ejemplos:* 'Gira 2025 - Auditorio Nacional', 'Evento Corporativo Banco X'.",
+            "3. Si perteneces a un equipo (plan Corporativo PRO) aparece además ☑ **Compartir con el equipo**: activado, el proyecto es compartido (TEAM); desactivado, es estrictamente privado.",
+            "4. Haz clic en **'Crear y continuar'**. El proyecto ya existe, con los valores por defecto.",
+            "**Paso 2 — Cómo quieres configurarlo**",
+            "Una pantalla limpia te ofrece dos caminos (puedes cambiar de método cuando quieras):",
+            "• **Configurar con asistencia de IA:** un asistente que te hace una pregunta a la vez y propone valores recomendados (ver 3.5).",
+            "• **Configurar manualmente:** la pantalla de configuración de siempre, con todos los controles avanzados. Cerrar esta pantalla equivale a elegir manual y no pierde nada."
           ]
         },
         {
@@ -118,6 +117,32 @@ export const part1: ManualPart = {
             "  • 🔵 **Sincronizando...:** Subiendo cambios de ingeniería.",
             "  • 🔴 **Error de Conexión:** Revisa tu conexión a internet; los datos no se están respaldando.",
             "**Sincronización Manual:** Haz clic en el botón ⟳ del Hub para forzar la descarga de cambios realizados por otros miembros del equipo."
+          ]
+        },
+        {
+          title: "3.5 Configuración Asistida por IA (Paso a Paso)",
+          content: [
+            "El asistente te lleva por la configuración con **una sola pregunta por pantalla**, sin menús ni formularios largos. Arriba hay una **barra con el porcentaje de avance**; abajo, la pista *Enter para continuar*.",
+            "**Cómo se maneja**",
+            "• **Continuar** (o la tecla Enter) avanza. La flecha **←** de la esquina vuelve atrás y **conserva tus respuestas**.",
+            "• Las preguntas opcionales tienen **Omitir**: se queda el valor actual.",
+            "• Si cierras el asistente (×), el borrador se conserva mientras no cierres la pestaña del navegador y lo retomas donde lo dejaste.",
+            "**El recorrido**",
+            "1. **Cuéntame tu evento (opcional, con IA).** Describe el evento con una frase («Festival al aire libre para 5.000 personas»). Verás el progreso real de lo que se está haciendo y, después, una lista de sugerencias. También puedes elegir **'Prefiero responder paso a paso'**.",
+            "2. **Esto es lo que entendí.** Cada sugerencia muestra *valor actual → propuesto* y su justificación. Las que no afectan a la seguridad vienen marcadas; **las de seguridad (capacidad de rigging, número de cajas o subgraves, etc.) nunca vienen marcadas y exigen una confirmación aparte**. Puedes **Ajustar** un valor. Las sugerencias que el sistema no puede aplicar (fuera de rango, parámetros que no existen) se listan como descartadas, con el motivo: nada se aplica sin pasar la validación.",
+            "3. **Preguntas básicas** (de 11 a 13, según tus respuestas): tipo de evento, dónde será, medidas de la sala (solo en interior), cuánta gente, hasta qué distancia llega el público, nivel deseado, sistema principal, cuántas cajas por lado (con **'Calcular con el motor'** para obtener el mínimo que alcanza tu objetivo), cómo se cuelga, subgraves (y su disposición solo si llevas), carga por punto de colgado y alimentación eléctrica.",
+            "4. **¿Quieres afinar más detalles?** Puedes ir a la revisión o responder preguntas opcionales de detalle: escenario, materiales de la sala, clima, curvatura del arreglo (splay), torres de delay, refuerzos de cobertura, monitores, cable de altavoz y red de audio.",
+            "5. **Revisemos los cambios.** Lista *antes → después* con la marca «sugerido por la IA» y «verificar» donde corresponde. **'Comprobar con el motor'** calcula el proyecto actual y el propuesto y muestra margen, cobertura, STI, rigging, peso y corriente. **'Pedir revisión a la IA'** (opcional) propone correcciones adicionales. Si cambiaste datos de seguridad o logística, debes marcar que los verificaste.",
+            "6. **Aplicar.** Los cambios se guardan en el proyecto y la sesión queda registrada. Desde la pantalla final puedes **Deshacer**, ir a **Calcular el sistema** o **Revisar manualmente**.",
+            "**Deshacer y registro**",
+            "• El proyecto guarda el **historial de los últimos 20 conjuntos de cambios** hechos con el asistente; se deshacen desde la pantalla final o desde la pestaña **Cambios** del panel de hallazgos (ver 12.5). Deshacer respeta lo que hayas editado a mano después y queda registrado como un cambio más.",
+            "• Cada sesión se guarda con la solicitud, las propuestas, tus decisiones y los resultados del motor (sin datos personales). Puedes **exportar el registro en JSON** desde la revisión.",
+            "**Límites que debes conocer**",
+            "• La IA **propone; el sistema valida; tú decides.** Nunca modifica el proyecto por su cuenta ni da por buena una configuración sin comprobarla con el motor.",
+            "• Un resultado del motor **no sustituye** la verificación de un rigger certificado ni los datos del fabricante en rigging y electricidad.",
+            "• Hay cosas que el motor **no modela** (zonas de público con objetivo propio, pendiente de gradas, obstrucciones, sistemas izquierdo y derecho distintos, datos medidos del fabricante GLL/CLF, importación de mediciones): el asistente lo dirá en lugar de inventar valores.",
+            "• En el plan Gratis, pedir sugerencias a la IA gasta una de tus 3 preguntas de bienvenida; el asistente paso a paso funciona también sin ellas.",
+            "• Lo que escribes puede usarse para mejorar el modelo del asistente (ver la política de privacidad): no incluyas datos confidenciales del cliente."
           ]
         }
       ]
