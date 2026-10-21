@@ -760,6 +760,24 @@ export const part2: ManualPart = {
             "El historial de los cambios hechos con el asistente guiado (*antes → después*, y si vienen de la IA). Cada conjunto tiene **Deshacer**; el proyecto en la nube se actualiza solo.",
             "**Exportar:** en 'Detalle técnico' (al pie del panel) está el botón 'Exportar registro (JSON)'."
           ]
+        },
+        {
+          title: "12.6 Ingeniero IA: Analizar mi Diseño",
+          content: [
+            "**Principio: el motor calcula, la IA lee y recomienda.** Todos los cálculos (acústica, alineación, rigging, electricidad…) los hace el motor de LiveSync Pro, con sus fórmulas y referencias. La IA **no recalcula nada**: lee los resultados y los hallazgos que el motor ya produjo y, con el manual y la base científica, te sugiere **qué parámetros cambiar**, con el nombre que ves en la pantalla y el valor recomendado.",
+            "**Qué lee la IA.** Un resumen del motor: las cifras principales (margen sobre el objetivo, cobertura, STI, carga de rigging, corriente…) y la lista de hallazgos del panel 12.5 —con los parámetros implicados y la acción que ya recomienda la aplicación—, más tu configuración. No recibe el nombre del cliente, el del proyecto ni las notas o textos libres.",
+            "**Chat del Ingeniero IA.** Haz preguntas como *«Revisa mi diseño y dime los 3 mayores riesgos»*. Si aún no has calculado el sistema, **el motor lo calcula por ti** antes de preguntar (verás «Calculando el sistema con el motor…»). La respuesta cita las cifras del motor, explica el porqué (con el manual y las fuentes) y dice qué parámetro cambiar y a qué valor. El chat **no modifica el proyecto**.",
+            "**Botón «Analizar mi diseño y proponer cambios».** Está en el panel del Ingeniero IA. Abre un análisis **sin preguntas**:",
+            "1. El motor calcula tu sistema.",
+            "2. La IA lee los hallazgos y propone **cambios en tus parámetros**, cada uno con *valor actual → propuesto*, su justificación y qué hallazgo resuelve. Las que afectan a seguridad (rigging, electricidad, viento, amplificador) **nunca vienen marcadas** y exigen una confirmación aparte.",
+            "3. Eliges las que quieras con **Usar N sugerencias** (puedes **Ajustar** un valor). Los cambios aparecen como *antes → después* y el motor **vuelve a calcular** para mostrar el efecto (margen, cobertura, STI, rigging, peso, corriente).",
+            "4. **Aplicar** guarda los cambios en el proyecto con historial; se deshacen desde la pestaña **Cambios** (12.5).",
+            "**Límites que debes conocer**",
+            "• La IA **propone; el sistema valida; tú decides.** Nada se aplica sin tu aprobación y cada propuesta pasa por la validación de parámetros, rangos y opciones.",
+            "• Si el motor no detecta un problema, la IA no lo inventa; y un resultado del motor **no sustituye** la verificación de un rigger certificado ni los datos del fabricante.",
+            "• En el plan Gratis, una pregunta o un análisis gasta una de tus 3 preguntas de bienvenida; si el asistente no llega a responder, **no se descuenta**.",
+            "• Lo que escribes puede usarse para mejorar el modelo del asistente (ver la política de privacidad): no incluyas datos confidenciales del cliente."
+          ]
         }
       ]
     }

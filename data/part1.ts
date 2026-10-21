@@ -142,6 +142,7 @@ export const part1: ManualPart = {
             "• Un resultado del motor **no sustituye** la verificación de un rigger certificado ni los datos del fabricante en rigging y electricidad.",
             "• Hay cosas que el motor **no modela** (zonas de público con objetivo propio, pendiente de gradas, obstrucciones, sistemas izquierdo y derecho distintos, datos medidos del fabricante GLL/CLF, importación de mediciones): el asistente lo dirá en lugar de inventar valores.",
             "• En el plan Gratis, pedir sugerencias a la IA gasta una de tus 3 preguntas de bienvenida; el asistente paso a paso funciona también sin ellas.",
+            "• Para revisar un diseño **ya configurado** no hace falta pasar por las preguntas: el botón **Analizar mi diseño y proponer cambios** del Ingeniero IA calcula con el motor y te propone cambios en los parámetros (ver 12.6).",
             "• Lo que escribes puede usarse para mejorar el modelo del asistente (ver la política de privacidad): no incluyas datos confidenciales del cliente."
           ]
         }
